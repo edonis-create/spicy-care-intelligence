@@ -1,0 +1,92 @@
+{
+  "patient_id": "322750546",
+  "dominant_tier": "P4",
+  "years_observed": 6,
+  "trajectory": [
+    {
+      "year": 2010,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 41,
+      "gender": "M",
+      "conditions": 1,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2011,
+      "phenotype_id": "P2",
+      "phenotype_label": "Moderate Risk",
+      "age": 42,
+      "gender": "M",
+      "conditions": 4,
+      "prescriptions": 8,
+      "admissions": 0,
+      "outpatient_visits": 3,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2012,
+      "phenotype_id": "P2",
+      "phenotype_label": "Moderate Risk",
+      "age": 43,
+      "gender": "M",
+      "conditions": 2,
+      "prescriptions": 10,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2013,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 45,
+      "gender": "M",
+      "conditions": 6,
+      "prescriptions": 11,
+      "admissions": 1,
+      "outpatient_visits": 3,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2014,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 45,
+      "gender": "M",
+      "conditions": 4,
+      "prescriptions": 11,
+      "admissions": 1,
+      "outpatient_visits": 2,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2015,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 47,
+      "gender": "M",
+      "conditions": 4,
+      "prescriptions": 17,
+      "admissions": 1,
+      "outpatient_visits": 5,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 6 years (2010-2015). Risk profile escalated from Low Risk to Chronic, Stable. Trajectory classified as dynamic (3 distinct tiers)."
+}

@@ -1,0 +1,70 @@
+{
+  "display_columns": [
+    "demo_patient_id",
+    "predicted_risk",
+    "risk_group",
+    "actual_outcome_text",
+    "actual_pdc",
+    "age_group_2015",
+    "megye_mode_2015",
+    "prediction_correct",
+    "prediction_error_type"
+  ],
+  "filter_columns": [
+    "risk_group",
+    "actual_outcome_text",
+    "prediction_error_type",
+    "age_group_2015",
+    "megye_mode_2015",
+    "client_id"
+  ],
+  "patient_card_columns": [
+    "demo_patient_id",
+    "predicted_risk",
+    "risk_group",
+    "actual_label",
+    "actual_outcome_text",
+    "actual_pdc",
+    "age_at_2015",
+    "age_group_2015",
+    "prediction_correct",
+    "prediction_error_type",
+    "model_source"
+  ],
+  "model_feature_columns_shown": [
+    "c09_2015_pdc_observed",
+    "c09_2015_pdc_low_80_flag",
+    "c09_2015_records",
+    "c09_2015_gap_count_30d",
+    "c09_2015_gap_count_60d",
+    "c09_2015_longest_gap_days",
+    "c09_2015_days_since_last_fill_to_obs_end",
+    "c09_2015_has_q4_fill",
+    "all_rx_2015_records",
+    "all_rx_2015_unique_atc_l3",
+    "all_rx_2015_unique_ttt",
+    "all_rx_2015_polypharmacy_atc_l3_ge_5",
+    "all_rx_2015_polypharmacy_atc_l3_ge_10",
+    "cv_2015_records",
+    "cv_2015_c09_share_of_all_records",
+    "dx_2015_has_I_circulatory",
+    "dx_2015_has_E_endocrine",
+    "dx_2015_has_N_genitourinary",
+    "dx_2015_has_J_respiratory"
+  ],
+  "hidden_columns": [
+    "actual_label",
+    "model_source"
+  ],
+  "sensitive_columns_excluded": [
+    "TAJ_NORM",
+    "TAJ",
+    "patient_id",
+    "ORVOSKOD",
+    "VENYAZ",
+    "observation_first_fill_date",
+    "observation_last_fill_date",
+    "prediction_first_fill_date",
+    "prediction_last_fill_date"
+  ]
+}

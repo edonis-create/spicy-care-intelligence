@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: spicy-care-intelligence
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/years
+    envVars:
+      - key: PORT
+        value: 8000

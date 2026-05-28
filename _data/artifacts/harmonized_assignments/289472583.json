@@ -1,0 +1,92 @@
+{
+  "patient_id": "289472583",
+  "dominant_tier": "P3",
+  "years_observed": 6,
+  "trajectory": [
+    {
+      "year": 2010,
+      "phenotype_id": "P2",
+      "phenotype_label": "Moderate Risk",
+      "age": 57,
+      "gender": "M",
+      "conditions": 4,
+      "prescriptions": 28,
+      "admissions": 0,
+      "outpatient_visits": 2,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2011,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 58,
+      "gender": "M",
+      "conditions": 6,
+      "prescriptions": 25,
+      "admissions": 1,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2012,
+      "phenotype_id": "P2",
+      "phenotype_label": "Moderate Risk",
+      "age": 59,
+      "gender": "M",
+      "conditions": 6,
+      "prescriptions": 29,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2013,
+      "phenotype_id": "P3",
+      "phenotype_label": "High Medication Need",
+      "age": 60,
+      "gender": "M",
+      "conditions": 8,
+      "prescriptions": 33,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2014,
+      "phenotype_id": "P3",
+      "phenotype_label": "High Medication Need",
+      "age": 61,
+      "gender": "M",
+      "conditions": 7,
+      "prescriptions": 41,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2015,
+      "phenotype_id": "P3",
+      "phenotype_label": "High Medication Need",
+      "age": 62,
+      "gender": "M",
+      "conditions": 12,
+      "prescriptions": 38,
+      "admissions": 0,
+      "outpatient_visits": 3,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 6 years (2010-2015). Risk profile escalated from Moderate Risk to High Medication Need. Trajectory classified as dynamic (3 distinct tiers)."
+}

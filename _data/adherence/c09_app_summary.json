@@ -1,0 +1,102 @@
+{
+  "generated_at_utc": "2026-05-20T10:38:44.658074+00:00",
+  "app_name": "Adherence Intelligence App",
+  "app_version": "0.1.0-demo",
+  "cohort": "C09 - Antihypertensives (ATC C09)",
+  "medication_group": "C09",
+  "observation_window": "2015-01-01 to 2015-12-31",
+  "prediction_window": "2016-01-01 to 2016-12-31",
+  "target_definition": "Non-adherent if PDC < 0.80 in the 2016 prediction window",
+  "total_demo_patients": 311716,
+  "average_predicted_risk": 0.4612,
+  "observed_non_adherence_rate": 0.4186,
+  "risk_group_counts": {
+    "High": 32725,
+    "Low": 135701,
+    "Medium": 58827,
+    "Very High": 84463
+  },
+  "risk_group_shares": {
+    "High": 0.105,
+    "Low": 0.4353,
+    "Medium": 0.1887,
+    "Very High": 0.271
+  },
+  "actual_outcome_counts": {
+    "Non-adherent": 130482,
+    "Adherent": 181234
+  },
+  "prediction_correct_rate_at_0_5": 0.8183,
+  "true_positive_count": 103239,
+  "false_positive_count": 29401,
+  "true_negative_count": 151833,
+  "false_negative_count": 27243,
+  "model_source": "centralized_logistic_baseline",
+  "centralized_baseline_metrics": {
+    "auroc": 0.8931497902380987,
+    "auprc": 0.860034240349262,
+    "accuracy": 0.8180266652978994,
+    "precision": 0.7780634556805501,
+    "recall": 0.79086004199813,
+    "specificity": 0.8375856627343655,
+    "f1": 0.7844095625403823,
+    "balanced_accuracy": 0.8142228523662478,
+    "brier_score": 0.1302035454987968,
+    "threshold": 0.5
+  },
+  "local_fl_metrics": {
+    "auroc": 0.8929423693055175,
+    "auprc": 0.8601023900186264,
+    "accuracy": 0.8176898202209704,
+    "precision": 0.777393623031207,
+    "recall": 0.7909596725985193,
+    "specificity": 0.8369345707759029,
+    "f1": 0.7841179755433234,
+    "balanced_accuracy": 0.8139471216872112,
+    "brier_score": 0.1303785890340805,
+    "clients": 20,
+    "rounds": 20,
+    "algorithm": "synchronous FedAvg"
+  },
+  "nvflare_metrics": {
+    "auroc": 0.892,
+    "auprc": 0.859,
+    "accuracy": 0.818,
+    "precision": 0.778,
+    "recall": 0.79,
+    "specificity": 0.836,
+    "f1": 0.784,
+    "balanced_accuracy": 0.813,
+    "brier_score": 0.13,
+    "clients": 20,
+    "rounds": 20,
+    "source_note": "FLARE metrics were provided from the completed simulator run; formal Task 10 validation files were not found."
+  },
+  "federated_clients": 20,
+  "patient_identifier_policy": "Demo patient IDs only (DEMO-XXXXXX format). No TAJ, TAJ_NORM, or real patient identifiers in app-facing files.",
+  "privacy_notes": [
+    "App-facing files contain demo-safe IDs only.",
+    "No real patient identifiers are stored in data/app/.",
+    "Prediction scores are derived from 2015 observation-window features.",
+    "Labels are from 2016 prediction-window outcomes.",
+    "Data was generated in a centralized development environment.",
+    "Federated learning reduces raw data movement but does not eliminate all privacy risk."
+  ],
+  "limitations": [
+    "This is a claims-based adherence risk signal, not a clinical diagnosis.",
+    "PDC is used as a pragmatic proxy for medication adherence.",
+    "DOT is used as a days-supply proxy for PDC; requires clinical validation.",
+    "The model is not clinically validated and is not deployment-ready.",
+    "Predictions are based on historical claims data from 2015.",
+    "The C09 cohort covers antihypertensive medications only.",
+    "Model convergence warning was recorded during training (max_iter reached).",
+    "No secure aggregation or differential privacy was used in FL simulations."
+  ],
+  "split_reconstruction_note": "Test split was recreated deterministically using the same logic as Task 6: train/validation/test = 70/15/15, stratified by label_non_adherent, random_state=42.",
+  "recommended_app_pages": [
+    "Overview Dashboard",
+    "Patient Explorer",
+    "Model and Federated Learning Evidence",
+    "Model Card and Limitations"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "year": 2015,
+  "k": 5,
+  "d": 19,
+  "seed": 42,
+  "source_file": "/mnt/c/Users/Admin/Desktop/heliX/data-preparation/federated_learning/data/partitions/client_0/client_0_2015.parquet",
+  "source_row_count": 992081,
+  "feature_names_ordered": [
+    "AGE_std",
+    "GENDER_binary",
+    "dx_unique_count_log",
+    "dx_chapter_A_B_uniq",
+    "dx_chapter_C_D_uniq",
+    "dx_chapter_E_uniq",
+    "dx_chapter_I_uniq",
+    "dx_chapter_J_uniq",
+    "dx_chapter_K_uniq",
+    "dx_chapter_N_uniq",
+    "dx_chapter_other_uniq",
+    "inpatient_admissions_log",
+    "has_inpatient",
+    "outpatient_visits_log",
+    "procedure_count_log",
+    "prescription_count_log",
+    "rx_atc_uniq_count_log",
+    "polypharmacy_flag",
+    "chronic_rx_flag"
+  ]
+}

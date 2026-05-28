@@ -1,0 +1,66 @@
+[
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.008652348683948732,
+    "stop_reason": "max_rounds_reached",
+    "year": 2010,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2010_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.033135188511833974,
+    "stop_reason": "max_rounds_reached",
+    "year": 2011,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2011_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.01834674280775176,
+    "stop_reason": "max_rounds_reached",
+    "year": 2012,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2012_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.02706382206901456,
+    "stop_reason": "max_rounds_reached",
+    "year": 2013,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2013_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.17070313021286204,
+    "stop_reason": "max_rounds_reached",
+    "year": 2014,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2014_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.005284781334710449,
+    "stop_reason": "max_rounds_reached",
+    "year": 2015,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2015_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.05432666033124197,
+    "stop_reason": "max_rounds_reached",
+    "year": 2016,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2016_assignments_2010_2017"
+  },
+  {
+    "rounds_observed": 15,
+    "last_max_centroid_shift": 0.05903196217392532,
+    "stop_reason": "max_rounds_reached",
+    "year": 2017,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2017_assignments_2010_2017"
+  }
+]

@@ -1,0 +1,259 @@
+{
+  "metadata": {
+    "year": 2011,
+    "k": 4,
+    "total_patients": 5383581
+  },
+  "metrics": {
+    "inertia": 40448738.13737348,
+    "calinski_harabasz": 2504140.5298007294,
+    "davies_bouldin": 1.2718239808572456,
+    "approx_silhouette": {
+      "value": 0.4737136500629913,
+      "label": "approximate",
+      "method": "centroid-based",
+      "std": 0.22406611112345098,
+      "weight": 5383581
+    }
+  },
+  "cluster_distribution": {
+    "counts": [
+      461090,
+      2853524,
+      576387,
+      1492580
+    ],
+    "proportions": [
+      0.08564745287569742,
+      0.5300419924953298,
+      0.10706386696884472,
+      0.27724668766012805
+    ],
+    "min_cluster_share": 0.08564745287569742,
+    "max_cluster_share": 0.5300419924953298
+  },
+  "cluster_profiles": [
+    {
+      "cluster_id": 0,
+      "cluster_count": 457518,
+      "cluster_share": 0.0849839539889898,
+      "feature_means": {
+        "AGE_std": 0.7821607280987626,
+        "GENDER_binary": 0.452060902521868,
+        "chronic_rx_flag": 0.96020265869321,
+        "dx_chapter_A_B_uniq": 0.3015028916895073,
+        "dx_chapter_C_D_uniq": 0.513752464383915,
+        "dx_chapter_E_uniq": 1.032383425351571,
+        "dx_chapter_I_uniq": 5.566537272850467,
+        "dx_chapter_J_uniq": 0.4716470171665377,
+        "dx_chapter_K_uniq": 0.3747480973426182,
+        "dx_chapter_N_uniq": 0.2682692265659493,
+        "dx_chapter_other_uniq": 3.895995348816877,
+        "dx_unique_count_log": 2.540248502962752,
+        "has_inpatient": 0.6216542299975083,
+        "inpatient_admissions_log": 0.7383427763299917,
+        "outpatient_visits_log": 2.0541019843110555,
+        "polypharmacy_flag": 0.8438618808440324,
+        "prescription_count_log": 3.452985576273876,
+        "procedure_count_log": 0.642240374496566,
+        "rx_atc_uniq_count_log": 1.8413552053223652
+      },
+      "feature_stds": {
+        "AGE_std": 0.5703834085315905,
+        "GENDER_binary": 0.497696536991149,
+        "chronic_rx_flag": 0.1954827688869301,
+        "dx_chapter_A_B_uniq": 0.7206758180513914,
+        "dx_chapter_C_D_uniq": 0.9706693199913202,
+        "dx_chapter_E_uniq": 1.1720417763263729,
+        "dx_chapter_I_uniq": 1.980340193156553,
+        "dx_chapter_J_uniq": 0.9789192836815348,
+        "dx_chapter_K_uniq": 0.8357181631641821,
+        "dx_chapter_N_uniq": 0.6426987780089611,
+        "dx_chapter_other_uniq": 2.064281899249265,
+        "dx_unique_count_log": 0.3288460460578349,
+        "has_inpatient": 0.4849744821366515,
+        "inpatient_admissions_log": 0.7400490156028272,
+        "outpatient_visits_log": 0.8268700389273032,
+        "polypharmacy_flag": 0.3629862351417812,
+        "prescription_count_log": 0.8758169851398864,
+        "procedure_count_log": 0.9402567601877142,
+        "rx_atc_uniq_count_log": 0.441351595391724
+      },
+      "feature_prevalence": {
+        "GENDER_binary": 0.452060902521868,
+        "chronic_rx_flag": 0.96020265869321,
+        "has_inpatient": 0.6216542299975083,
+        "polypharmacy_flag": 0.8438618808440324
+      }
+    },
+    {
+      "cluster_id": 1,
+      "cluster_count": 2854728,
+      "cluster_share": 0.5302656354571428,
+      "feature_means": {
+        "AGE_std": -0.6548088362479277,
+        "GENDER_binary": 0.4262528689248152,
+        "chronic_rx_flag": 0.0181751116043279,
+        "dx_chapter_A_B_uniq": 0.0188087971953895,
+        "dx_chapter_C_D_uniq": 0.0292357100221106,
+        "dx_chapter_E_uniq": 0.0192918554762485,
+        "dx_chapter_I_uniq": 0.1428689528389394,
+        "dx_chapter_J_uniq": 0.0241024714088347,
+        "dx_chapter_K_uniq": 0.0137095373009267,
+        "dx_chapter_N_uniq": 0.0150739404945059,
+        "dx_chapter_other_uniq": 1.8985556592431925,
+        "dx_unique_count_log": 1.0731858097321474,
+        "has_inpatient": 0.0557219461889188,
+        "inpatient_admissions_log": 0.0453302301569115,
+        "outpatient_visits_log": 1.079936089060735,
+        "polypharmacy_flag": 0.0005170369996721,
+        "prescription_count_log": 0.1817582480563432,
+        "procedure_count_log": 0.0340385296989533,
+        "rx_atc_uniq_count_log": 0.1477651847298152
+      },
+      "feature_stds": {
+        "AGE_std": 0.8226345587777788,
+        "GENDER_binary": 0.494531455681213,
+        "chronic_rx_flag": 0.1335843438524822,
+        "dx_chapter_A_B_uniq": 0.1587593494091259,
+        "dx_chapter_C_D_uniq": 0.2240040311158222,
+        "dx_chapter_E_uniq": 0.1665684213232583,
+        "dx_chapter_I_uniq": 0.41386191105669,
+        "dx_chapter_J_uniq": 0.1998024101584106,
+        "dx_chapter_K_uniq": 0.1488478532836849,
+        "dx_chapter_N_uniq": 0.1353367987360304,
+        "dx_chapter_other_uniq": 1.160289883285936,
+        "dx_unique_count_log": 0.3800490231065266,
+        "has_inpatient": 0.2293839813540564,
+        "inpatient_admissions_log": 0.2020982548436082,
+        "outpatient_visits_log": 0.556837684574462,
+        "polypharmacy_flag": 0.0227325685397205,
+        "prescription_count_log": 0.4156116816566518,
+        "procedure_count_log": 0.2136761676513272,
+        "rx_atc_uniq_count_log": 0.321524048291481
+      },
+      "feature_prevalence": {
+        "GENDER_binary": 0.4262528689248152,
+        "chronic_rx_flag": 0.0181751116043279,
+        "has_inpatient": 0.0557219461889188,
+        "polypharmacy_flag": 0.0005170369996721
+      }
+    },
+    {
+      "cluster_id": 2,
+      "cluster_count": 576575,
+      "cluster_share": 0.1070987879628819,
+      "feature_means": {
+        "AGE_std": 0.1372151265257486,
+        "GENDER_binary": 0.2687456098512769,
+        "chronic_rx_flag": 0.7496318778996661,
+        "dx_chapter_A_B_uniq": 0.3626067727528942,
+        "dx_chapter_C_D_uniq": 0.4168581710965616,
+        "dx_chapter_E_uniq": 0.5272566448423882,
+        "dx_chapter_I_uniq": 2.0920036421974597,
+        "dx_chapter_J_uniq": 0.2271517148679703,
+        "dx_chapter_K_uniq": 0.2473121449941464,
+        "dx_chapter_N_uniq": 0.1276087239301045,
+        "dx_chapter_other_uniq": 8.81392706933183,
+        "dx_unique_count_log": 2.5481515888346924,
+        "has_inpatient": 0.5285591640289642,
+        "inpatient_admissions_log": 0.5747460444269971,
+        "outpatient_visits_log": 2.39154658764038,
+        "polypharmacy_flag": 0.5491653297489485,
+        "prescription_count_log": 2.5776202934016217,
+        "procedure_count_log": 0.4466634279240571,
+        "rx_atc_uniq_count_log": 1.4170336375275447
+      },
+      "feature_stds": {
+        "AGE_std": 0.8737051276661632,
+        "GENDER_binary": 0.4433073505333993,
+        "chronic_rx_flag": 0.4332250287509785,
+        "dx_chapter_A_B_uniq": 0.8456184419703895,
+        "dx_chapter_C_D_uniq": 0.8554942053002644,
+        "dx_chapter_E_uniq": 0.9604731145295448,
+        "dx_chapter_I_uniq": 2.034728821424952,
+        "dx_chapter_J_uniq": 0.6795275488449567,
+        "dx_chapter_K_uniq": 0.6866000494973984,
+        "dx_chapter_N_uniq": 0.4446467403666824,
+        "dx_chapter_other_uniq": 2.9024457645094053,
+        "dx_unique_count_log": 0.3813269433054942,
+        "has_inpatient": 0.4991837078170387,
+        "inpatient_admissions_log": 0.6743813461093737,
+        "outpatient_visits_log": 0.8091960919225634,
+        "polypharmacy_flag": 0.4975768989318909,
+        "prescription_count_log": 1.3550057992762348,
+        "procedure_count_log": 0.7596470539212471,
+        "rx_atc_uniq_count_log": 0.7042226078657811
+      },
+      "feature_prevalence": {
+        "GENDER_binary": 0.2687456098512769,
+        "chronic_rx_flag": 0.7496318778996661,
+        "has_inpatient": 0.5285591640289642,
+        "polypharmacy_flag": 0.5491653297489485
+      }
+    },
+    {
+      "cluster_id": 3,
+      "cluster_count": 1494760,
+      "cluster_share": 0.2776516225909854,
+      "feature_means": {
+        "AGE_std": 0.5245534097543118,
+        "GENDER_binary": 0.4138269688779469,
+        "chronic_rx_flag": 0.9331009660413712,
+        "dx_chapter_A_B_uniq": 0.0418976959511894,
+        "dx_chapter_C_D_uniq": 0.091535764938853,
+        "dx_chapter_E_uniq": 0.2295017260295967,
+        "dx_chapter_I_uniq": 1.6126823035136075,
+        "dx_chapter_J_uniq": 0.0690257967834301,
+        "dx_chapter_K_uniq": 0.0700159222885279,
+        "dx_chapter_N_uniq": 0.0487904412748534,
+        "dx_chapter_other_uniq": 2.261330915999893,
+        "dx_unique_count_log": 1.623115028734431,
+        "has_inpatient": 0.1173385694024458,
+        "inpatient_admissions_log": 0.1041472064066455,
+        "outpatient_visits_log": 1.354108075547321,
+        "polypharmacy_flag": 0.3630897267788809,
+        "prescription_count_log": 2.771379481067069,
+        "procedure_count_log": 0.0810524657566955,
+        "rx_atc_uniq_count_log": 1.3180332412121447
+      },
+      "feature_stds": {
+        "AGE_std": 0.6640994580495285,
+        "GENDER_binary": 0.4925182318526266,
+        "chronic_rx_flag": 0.2498470596465586,
+        "dx_chapter_A_B_uniq": 0.2490919485135984,
+        "dx_chapter_C_D_uniq": 0.4005132235113454,
+        "dx_chapter_E_uniq": 0.5999106996917654,
+        "dx_chapter_I_uniq": 1.0202683131115946,
+        "dx_chapter_J_uniq": 0.3584955277758024,
+        "dx_chapter_K_uniq": 0.3421332221650947,
+        "dx_chapter_N_uniq": 0.2660508929316654,
+        "dx_chapter_other_uniq": 1.4010963756043011,
+        "dx_unique_count_log": 0.3715296854266856,
+        "has_inpatient": 0.3218232892955904,
+        "inpatient_admissions_log": 0.316192292928196,
+        "outpatient_visits_log": 0.7071641008546401,
+        "polypharmacy_flag": 0.480890400285261,
+        "prescription_count_log": 0.7924990739317088,
+        "procedure_count_log": 0.3307872002623049,
+        "rx_atc_uniq_count_log": 0.4221966581776825
+      },
+      "feature_prevalence": {
+        "GENDER_binary": 0.4138269688779469,
+        "chronic_rx_flag": 0.9331009660413712,
+        "has_inpatient": 0.1173385694024458,
+        "polypharmacy_flag": 0.3630897267788809
+      }
+    }
+  ],
+  "validation": {
+    "warnings": [
+      "cluster_count mismatch between distribution and profile CSV (distribution - profile = [3572, -1204, -188, -2180])",
+      "cluster_share mismatch at cluster 0: profile=0.0849839539889898, distribution=0.08564745287569742",
+      "cluster_share mismatch at cluster 1: profile=0.5302656354571428, distribution=0.5300419924953298",
+      "cluster_share mismatch at cluster 2: profile=0.1070987879628819, distribution=0.10706386696884472",
+      "cluster_share mismatch at cluster 3: profile=0.2776516225909854, distribution=0.27724668766012805"
+    ],
+    "has_warnings": true
+  }
+}

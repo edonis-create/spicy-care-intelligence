@@ -1,0 +1,26 @@
+feature,importance_gain,importance_split,rank_gain,rank_split,product_group,interpretation_note
+atc_C_flag,5625294.597049713,10,1,91,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+age_at_index,2179997.6631565094,1749,2,4,Demographics,Association signal for aggregate cohort explanation; not causal evidence.
+total_dot,858254.9230918884,1364,3,8,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+prescription_count_last_12_months,516865.2469959259,779,4,23,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+antihypertensive_medication_count,457068.86920166016,880,5,16,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+observation_span_days,403156.94511318207,2337,6,1,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+icd_chapter_I_count,313482.02091503143,969,7,15,Diagnosis burden,Association signal for aggregate cohort explanation; not causal evidence.
+prescription_span_days,297394.14901542664,1814,8,2,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+atc_C_count,259409.9704055786,792,9,22,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+mean_dot,257912.94924163818,1792,10,3,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+mean_dispensed_quantity,242517.91320705414,1720,11,5,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+prescription_count_trend_last_minus_first,233248.55438613892,1432,12,7,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+total_diagnosis_event_count,212596.51723575592,1288,13,9,Diagnosis burden,Association signal for aggregate cohort explanation; not causal evidence.
+mean_quantity,207274.72384166718,1585,14,6,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+max_dot,204631.91950321198,878,15,17,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+unique_bno_code_count,166464.79410743713,839,16,19,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+total_dispensed_quantity,164986.75966835022,1144,17,12,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+total_quantity,163845.12321853638,1192,18,11,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+monthly_prescription_count_std,156880.43042850494,1231,19,10,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+monthly_prescription_count_mean,155948.83119010925,1108,20,13,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+atc_N_count,141929.9439353943,1064,21,14,Medication burden,Association signal for aggregate cohort explanation; not causal evidence.
+jaro_contact_count,127072.05938148499,830,22,20,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+max_dispensed_quantity,125199.87079906464,427,23,34,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.
+icd_chapter_M_count,125070.52576351166,855,24,18,Diagnosis burden,Association signal for aggregate cohort explanation; not causal evidence.
+unique_bno_3char_count,123789.18850898743,638,25,27,Utilization / clinical history,Association signal for aggregate cohort explanation; not causal evidence.

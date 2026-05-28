@@ -1,0 +1,104 @@
+{
+  "distribution": [
+    {
+      "bin_label": "0.0000-0.0010",
+      "risk_min": 0.0,
+      "risk_max": 0.001,
+      "patient_count": 0,
+      "patient_percent": 0.0,
+      "observed_positive_count": 0,
+      "observed_positive_rate": 0.0,
+      "mean_calibrated_risk": null
+    },
+    {
+      "bin_label": "0.0010-0.0020",
+      "risk_min": 0.001,
+      "risk_max": 0.002,
+      "patient_count": 0,
+      "patient_percent": 0.0,
+      "observed_positive_count": 0,
+      "observed_positive_rate": 0.0,
+      "mean_calibrated_risk": null
+    },
+    {
+      "bin_label": "0.0020-0.0050",
+      "risk_min": 0.002,
+      "risk_max": 0.005,
+      "patient_count": 2632710,
+      "patient_percent": 45.0782,
+      "observed_positive_count": 313,
+      "observed_positive_rate": 0.000119,
+      "mean_calibrated_risk": 0.0035035107008843007
+    },
+    {
+      "bin_label": "0.0050-0.0100",
+      "risk_min": 0.005,
+      "risk_max": 0.01,
+      "patient_count": 876514,
+      "patient_percent": 15.008,
+      "observed_positive_count": 754,
+      "observed_positive_rate": 0.00086,
+      "mean_calibrated_risk": 0.006940198246264641
+    },
+    {
+      "bin_label": "0.0100-0.0200",
+      "risk_min": 0.01,
+      "risk_max": 0.02,
+      "patient_count": 674653,
+      "patient_percent": 11.5516,
+      "observed_positive_count": 1338,
+      "observed_positive_rate": 0.001983,
+      "mean_calibrated_risk": 0.01433268980472692
+    },
+    {
+      "bin_label": "0.0200-0.0500",
+      "risk_min": 0.02,
+      "risk_max": 0.05,
+      "patient_count": 984685,
+      "patient_percent": 16.8601,
+      "observed_positive_count": 3967,
+      "observed_positive_rate": 0.004029,
+      "mean_calibrated_risk": 0.033500301071421934
+    },
+    {
+      "bin_label": "0.0500-0.1000",
+      "risk_min": 0.05,
+      "risk_max": 0.1,
+      "patient_count": 632373,
+      "patient_percent": 10.8277,
+      "observed_positive_count": 9152,
+      "observed_positive_rate": 0.014472,
+      "mean_calibrated_risk": 0.06803428061436871
+    },
+    {
+      "bin_label": "0.1000-0.2000",
+      "risk_min": 0.1,
+      "risk_max": 0.2,
+      "patient_count": 39384,
+      "patient_percent": 0.6743,
+      "observed_positive_count": 3303,
+      "observed_positive_rate": 0.083867,
+      "mean_calibrated_risk": 0.10957836995767964
+    },
+    {
+      "bin_label": "0.2000-0.5000",
+      "risk_min": 0.2,
+      "risk_max": 0.5,
+      "patient_count": 0,
+      "patient_percent": 0.0,
+      "observed_positive_count": 0,
+      "observed_positive_rate": 0.0,
+      "mean_calibrated_risk": null
+    },
+    {
+      "bin_label": "0.5000-1.0000",
+      "risk_min": 0.5,
+      "risk_max": 1.0,
+      "patient_count": 0,
+      "patient_percent": 0.0,
+      "observed_positive_count": 0,
+      "observed_positive_rate": 0.0,
+      "mean_calibrated_risk": null
+    }
+  ]
+}

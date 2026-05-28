@@ -1,0 +1,460 @@
+/* =========================================================================
+ * Patient Stratification — Design System
+ * ========================================================================= */
+
+:root {
+  /* ── Base background canvas ────────────────────────────────────────── */
+  --bg-base: #0a0a0b;
+  --bg-canvas: #0d0d0e;
+
+  /* ── Surface elevation scale ───────────────────────────────────────── */
+  --surface-1: #131315;
+  --surface-1-hover: #17171a;
+  --surface-2: #18181b;
+  --surface-2-hover: #1d1d21;
+  --surface-3: #1f1f23;
+  --surface-overlay: rgba(20, 20, 22, 0.86);
+
+  /* ── Borders / dividers ────────────────────────────────────────────── */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(220, 38, 38, 0.32);
+
+  /* ── Text scale ────────────────────────────────────────────────────── */
+  --text-primary: #f4f4f5;     /* headlines, hero metrics */
+  --text-secondary: #c5c5ca;   /* body */
+  --text-tertiary: #8a8a92;    /* meta / supporting */
+  --text-quaternary: #5b5b62;  /* axis ticks, hints */
+  --text-on-accent: #ffffff;
+
+  /* ── Brand accent (red) — punchy, saturated ───────────────────────── */
+  --accent: #ff2a2a;
+  --accent-hover: #ff4444;
+  --accent-soft: rgba(255, 42, 42, 0.18);
+  --accent-softer: rgba(255, 42, 42, 0.10);
+  --accent-ring: rgba(255, 42, 42, 0.40);
+  --accent-glow: rgba(255, 42, 42, 0.32);
+
+  /* ── Status tones ──────────────────────────────────────────────────── */
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.12);
+  --warning: #f5b45c;
+  --warning-soft: rgba(245, 180, 92, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+  --info: #7aa2f7;
+  --info-soft: rgba(122, 162, 247, 0.14);
+
+  /* ── Shadows ───────────────────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.32);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.28), 0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.36), 0 2px 6px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.48), 0 6px 12px rgba(0, 0, 0, 0.28);
+  --shadow-glow: 0 0 0 1px var(--accent-ring), 0 8px 28px var(--accent-glow);
+
+  /* ── Radii ─────────────────────────────────────────────────────────── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* ── Layout ────────────────────────────────────────────────────────── */
+  --header-h: 60px;
+  --sidebar-w: 248px;
+
+  color: var(--text-secondary);
+  background: var(--bg-base);
+  font-family:
+    "Inter", "InterVariable", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+/* Stable scrollbar avoids header vs content width mismatch when scrollbar appears */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* ── Body canvas: layered ambient gradients ───────────────────────────── */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70rem 40rem at 12% -10%, rgba(255, 42, 42, 0.12), transparent 60%),
+    radial-gradient(ellipse 50rem 30rem at 92% 0%, rgba(255, 255, 255, 0.025), transparent 55%),
+    radial-gradient(ellipse 60rem 50rem at 50% 110%, rgba(255, 42, 42, 0.06), transparent 55%),
+    var(--bg-base);
+  color: var(--text-secondary);
+}
+
+/* =========================================================================
+ * NEUTRALIZE legacy slate-* utilities (older pages were authored against
+ * the light palette). We reroute them into our token system.
+ * ========================================================================= */
+
+.bg-white {
+  background-color: var(--surface-1) !important;
+}
+.bg-slate-50 {
+  background-color: var(--surface-3) !important;
+}
+.bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+.bg-slate-900,
+.bg-slate-950 {
+  background-color: var(--surface-3) !important;
+}
+.bg-black {
+  background-color: var(--bg-base) !important;
+}
+
+.border-slate-100,
+.border-slate-200,
+.border-slate-300 {
+  border-color: var(--border-default) !important;
+}
+.border-slate-800,
+.border-slate-900 {
+  border-color: var(--border-strong) !important;
+}
+
+.divide-slate-100 > * + *,
+.divide-slate-200 > * + * {
+  border-color: var(--border-default) !important;
+}
+
+.text-slate-950,
+.text-slate-900 {
+  color: var(--text-primary) !important;
+}
+.text-slate-800,
+.text-slate-700 {
+  color: var(--text-secondary) !important;
+}
+.text-slate-600,
+.text-slate-500 {
+  color: var(--text-tertiary) !important;
+}
+.text-slate-400 {
+  color: var(--text-tertiary) !important;
+}
+.text-slate-300,
+.text-slate-200,
+.text-slate-100 {
+  color: var(--text-secondary) !important;
+}
+
+/* =========================================================================
+ * Surfaces — depth system
+ * Use these utility classes (or the React primitives) instead of bg-*.
+ * ========================================================================= */
+
+.surface-1 {
+  background: linear-gradient(180deg, var(--surface-1) 0%, #101012 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+.surface-1::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 18%,
+    rgba(255, 255, 255, 0.08) 82%,
+    transparent 100%
+  );
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  pointer-events: none;
+}
+
+.surface-2 {
+  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+  position: relative;
+}
+.surface-2::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 20%,
+    rgba(255, 255, 255, 0.07) 80%,
+    transparent 100%
+  );
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  pointer-events: none;
+}
+.surface-2.is-interactive:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(180deg, var(--surface-2-hover) 0%, var(--surface-2) 100%);
+}
+
+.surface-3 {
+  background:
+    radial-gradient(ellipse 24rem 16rem at 50% 0%, rgba(255, 255, 255, 0.025), transparent 70%),
+    var(--surface-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+/* Legacy aliases so old class names still work during transition. */
+.panel-surface,
+.panel-surface-soft {
+  background: linear-gradient(180deg, var(--surface-1) 0%, #101012 100%) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-md) !important;
+  position: relative;
+}
+.panel-surface::before,
+.panel-surface-soft::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0.08) 80%,
+    transparent 100%
+  );
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  pointer-events: none;
+}
+.panel-card {
+  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease !important;
+  position: relative;
+}
+.panel-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 22%,
+    rgba(255, 255, 255, 0.07) 78%,
+    transparent 100%
+  );
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  pointer-events: none;
+}
+.panel-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong) !important;
+  box-shadow: var(--shadow-md) !important;
+  background: linear-gradient(180deg, var(--surface-2-hover) 0%, var(--surface-2) 100%) !important;
+}
+
+.premium-control {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+.premium-control:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-1-hover) !important;
+}
+
+/* =========================================================================
+ * Form elements — unified premium dark style.
+ * ========================================================================= */
+
+select,
+input,
+textarea {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-feature-settings: inherit;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-tertiary) 50%),
+    linear-gradient(135deg, var(--text-tertiary) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 52%, calc(100% - 13px) 52%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 32px;
+  cursor: pointer;
+}
+select:hover,
+input:hover,
+textarea:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-1-hover);
+}
+select:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+/* Dark dropdown panel — Chromium / Edge honor these on <option>. */
+select,
+option,
+optgroup {
+  color-scheme: dark;
+}
+option,
+optgroup {
+  background-color: var(--surface-1);
+  color: var(--text-primary);
+  padding: 8px 12px;
+}
+option:checked,
+option:hover {
+  background-color: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+/* =========================================================================
+ * Scrollbars — quiet & branded.
+ * ========================================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* =========================================================================
+ * Selection / focus visuals.
+ * ========================================================================= */
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent-ring);
+  border-radius: var(--radius-md);
+}
+
+/* =========================================================================
+ * Animations
+ * ========================================================================= */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-up {
+  animation: fade-up 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    var(--surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.5; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.pulse-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+/* =========================================================================
+ * Utility helpers
+ * ========================================================================= */
+
+.text-display {
+  font-feature-settings: "cv11", "ss01", "ss03";
+  letter-spacing: -0.025em;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+.divider-h {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-default) 18%,
+    var(--border-default) 82%,
+    transparent
+  );
+}

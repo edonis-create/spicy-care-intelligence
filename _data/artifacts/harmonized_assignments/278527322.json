@@ -1,0 +1,50 @@
+{
+  "patient_id": "278527322",
+  "dominant_tier": "P5",
+  "years_observed": 3,
+  "trajectory": [
+    {
+      "year": 2010,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 60,
+      "gender": "M",
+      "conditions": 18,
+      "prescriptions": 92,
+      "admissions": 5,
+      "outpatient_visits": 50,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2011,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 61,
+      "gender": "M",
+      "conditions": 20,
+      "prescriptions": 103,
+      "admissions": 9,
+      "outpatient_visits": 38,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2012,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 61,
+      "gender": "M",
+      "conditions": 21,
+      "prescriptions": 16,
+      "admissions": 5,
+      "outpatient_visits": 4,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 3 years (2010-2012). Risk profile remained in High Complexity. Trajectory classified as stable (1 distinct tier)."
+}

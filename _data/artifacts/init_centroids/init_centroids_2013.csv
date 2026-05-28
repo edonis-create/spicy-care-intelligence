@@ -1,0 +1,6 @@
+AGE_std,GENDER_binary,dx_unique_count_log,dx_chapter_A_B_uniq,dx_chapter_C_D_uniq,dx_chapter_E_uniq,dx_chapter_I_uniq,dx_chapter_J_uniq,dx_chapter_K_uniq,dx_chapter_N_uniq,dx_chapter_other_uniq,inpatient_admissions_log,has_inpatient,outpatient_visits_log,procedure_count_log,prescription_count_log,rx_atc_uniq_count_log,polypharmacy_flag,chronic_rx_flag
+0.5814697,1.0,1.7917595,0.0,0.0,0.0,3.0,0.0,0.0,0.0,2.0,0.0,0.0,1.7917595,0.0,0.0,0.0,0.0,0.0
+1.410171,1.0,1.7917595,0.0,0.0,0.0,2.0,0.0,0.0,0.0,3.0,0.0,0.0,1.609438,0.0,4.0943446,1.7917595,1.0,1.0
+-0.70762134,0.0,0.6931472,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.3862944,0.0,0.0,0.0,0.0,0.0
+-1.4838576,0.0,2.3978953,0.0,0.0,0.0,0.0,0.0,0.0,1.0,9.0,0.6931472,1.0,2.5649493,1.9459101,0.0,0.0,0.0,0.0
+0.25919697,0.0,1.609438,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4.0,0.0,0.0,1.609438,0.0,1.609438,0.6931472,0.0,1.0

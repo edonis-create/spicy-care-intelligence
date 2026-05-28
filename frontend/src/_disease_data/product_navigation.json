@@ -1,0 +1,84 @@
+[
+  {
+    "page": "Overview",
+    "route": "/overview",
+    "purpose": "Show business value, use case status, model trust, and partner participation.",
+    "primary_user": "Healthcare executives / business stakeholders",
+    "data_sources": [
+      "project_summary.json",
+      "model_registry.json",
+      "validation_engine_summary.json"
+    ]
+  },
+  {
+    "page": "Risk Population",
+    "route": "/risk-population",
+    "purpose": "Show where diabetes onset risk is concentrated by bands and aggregate cohorts.",
+    "primary_user": "Population health managers",
+    "data_sources": [
+      "threshold_analysis_summary.csv"
+    ]
+  },
+  {
+    "page": "Intervention Planner",
+    "route": "/intervention-planner",
+    "purpose": "Plan prevention capacity using thresholds, top-k bands, recall targets, and workload estimates.",
+    "primary_user": "Population health managers",
+    "data_sources": [
+      "threshold_analysis_summary.csv",
+      "project_summary.json"
+    ]
+  },
+  {
+    "page": "Cohort Insights",
+    "route": "/cohort-insights",
+    "purpose": "Explain aggregate risk drivers and clinical characteristics of selected high-risk cohorts.",
+    "primary_user": "Clinical prevention / care management teams",
+    "data_sources": [
+      "feature_importance_summary.csv"
+    ]
+  },
+  {
+    "page": "Partner Sites",
+    "route": "/partner-sites",
+    "purpose": "Show aggregate partner site participation, data validation, and readiness.",
+    "primary_user": "Partner institution / site reviewers",
+    "data_sources": [
+      "fl_client_summary.csv",
+      "validation_engine_summary.json"
+    ]
+  },
+  {
+    "page": "Trust & Validation",
+    "route": "/trust-validation",
+    "purpose": "Show performance, calibration, temporal stability, validation status, and limitations.",
+    "primary_user": "Healthcare executives / business stakeholders",
+    "data_sources": [
+      "centralized_vs_federated_metrics.csv",
+      "temporal_validation_metrics.csv",
+      "calibration_summary.csv",
+      "validation_engine_summary.json",
+      "limitations.json"
+    ]
+  },
+  {
+    "page": "Reports",
+    "route": "/reports",
+    "purpose": "Download governance-ready executive, population risk, partner site, and validation reports.",
+    "primary_user": "Healthcare executives / business stakeholders",
+    "data_sources": [
+      "dashboard_manifest.json",
+      "limitations.json"
+    ]
+  },
+  {
+    "page": "Settings",
+    "route": "/settings",
+    "purpose": "Configure product-level use case, model version, horizon, threshold defaults, and export formats.",
+    "primary_user": "Population health managers",
+    "data_sources": [
+      "model_registry.json",
+      "api_contract.json"
+    ]
+  }
+]

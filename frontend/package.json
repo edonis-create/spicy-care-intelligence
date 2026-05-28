@@ -1,0 +1,41 @@
+{
+  "name": "spicy-care-intelligence",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@vitejs/plugin-react": "latest",
+    "clsx": "^2.1.1",
+    "d3-sankey": "^0.12.3",
+    "d3-shape": "^3.2.0",
+    "lucide-react": "latest",
+    "papaparse": "^5.5.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.30.1",
+    "recharts": "^3.8.1",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@types/d3-sankey": "^0.12.4",
+    "@types/d3-shape": "^3.1.6",
+    "@types/papaparse": "^5.3.15",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "autoprefixer": "latest",
+    "eslint": "latest",
+    "eslint-plugin-react-hooks": "latest",
+    "eslint-plugin-react-refresh": "latest",
+    "postcss": "latest",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.8.3"
+  }
+}

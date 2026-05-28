@@ -1,0 +1,66 @@
+[
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.027872405942596476,
+    "stop_reason": "max_rounds_reached",
+    "year": 2010,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2010_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.1466281661677286,
+    "stop_reason": "max_rounds_reached",
+    "year": 2011,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2011_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.08597139843001089,
+    "stop_reason": "max_rounds_reached",
+    "year": 2012,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2012_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.10571666360464291,
+    "stop_reason": "max_rounds_reached",
+    "year": 2013,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2013_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.4128532580511379,
+    "stop_reason": "max_rounds_reached",
+    "year": 2014,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2014_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.012416605863636063,
+    "stop_reason": "max_rounds_reached",
+    "year": 2015,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2015_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.11022686072623206,
+    "stop_reason": "max_rounds_reached",
+    "year": 2016,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2016_dist"
+  },
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.155161330002967,
+    "stop_reason": "max_rounds_reached",
+    "year": 2017,
+    "k": 5,
+    "workspace": "_nvflare_sim_workspace_kmeans_2017_dist"
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "models": [
+    {
+      "model_id": "enhanced_clinical_lightgbm",
+      "model_name": "Enhanced clinical LightGBM",
+      "training_mode": "centralized",
+      "model_type": "LightGBM",
+      "calibration_status": "uncalibrated",
+      "product_role": "Benchmark candidate excluding geography predictors"
+    },
+    {
+      "model_id": "enhanced_clinical_sigmoid_calibrated",
+      "model_name": "Enhanced clinical LightGBM with sigmoid calibration",
+      "training_mode": "centralized",
+      "model_type": "LightGBM + sigmoid calibration",
+      "calibration_status": "calibrated",
+      "product_role": "Recommended centralized candidate for calibrated risk communication",
+      "recommended_probability_version": "sigmoid"
+    },
+    {
+      "model_id": "federated_random_4_client_mlp",
+      "model_name": "Random 4-client collaborative MLP",
+      "training_mode": "collaborative training",
+      "model_type": "PyTorch MLP",
+      "calibration_status": "not_calibrated",
+      "product_role": "Proof-of-concept privacy-preserving collaboration evidence"
+    }
+  ],
+  "comparison_note": "Centralized and collaborative models are not architecture-identical; compare directionally."
+}

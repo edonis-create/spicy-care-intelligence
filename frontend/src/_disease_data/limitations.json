@@ -1,0 +1,61 @@
+{
+  "product_name": "SPICY CareRisk",
+  "use_case": "UC1 Broad Diabetes Onset Prediction",
+  "limitations": [
+    {
+      "id": "L1",
+      "description": "Current partner sites are synthetic random clients, not real hospitals or institutions."
+    },
+    {
+      "id": "L2",
+      "description": "Current collaborative training split is synthetic/random/IID-style and not real institution-based."
+    },
+    {
+      "id": "L3",
+      "description": "Collaborative model is a local simulator proof of concept, not a secure provisioned production FLARE deployment."
+    },
+    {
+      "id": "L4",
+      "description": "Collaborative model is a PyTorch MLP while the centralized benchmark is LightGBM; comparisons are directional."
+    },
+    {
+      "id": "L5",
+      "description": "Collaborative model probabilities are not yet calibrated unless a future calibration artifact is supplied."
+    },
+    {
+      "id": "L6",
+      "description": "Rare outcome prevalence causes low precision; accuracy and threshold 0.5 are misleading planning metrics."
+    },
+    {
+      "id": "L7",
+      "description": "No real institution-based validation has been completed yet."
+    },
+    {
+      "id": "L8",
+      "description": "No external validation has been completed yet."
+    },
+    {
+      "id": "L9",
+      "description": "Administrative claims labels may contain coding noise."
+    },
+    {
+      "id": "L10",
+      "description": "Feature importance describes association, not causality."
+    },
+    {
+      "id": "L11",
+      "description": "Version 1 dashboard should expose aggregate data only, not patient-level records."
+    },
+    {
+      "id": "L12",
+      "description": "Privacy-preserving collaboration reduces raw data sharing but does not eliminate all privacy risks."
+    }
+  ],
+  "display_priority": [
+    "synthetic split",
+    "local simulator",
+    "directional comparison",
+    "not calibrated",
+    "aggregate only"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "status": "placeholder",
+  "risk_bands": [],
+  "schema": [
+    "risk_band",
+    "patient_count",
+    "observed_event_rate",
+    "captured_positives",
+    "model_id",
+    "note"
+  ],
+  "note": "Patient-level prediction risk bands are not available in aggregate dashboard data yet."
+}

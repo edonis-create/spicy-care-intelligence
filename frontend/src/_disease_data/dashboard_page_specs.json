@@ -1,0 +1,561 @@
+[
+  {
+    "page": "Overview",
+    "route": "/overview",
+    "metrics": [
+      {
+        "metric_id": "overview_total_population",
+        "label": "Total population",
+        "data_file": "project_summary.json",
+        "field": "total_patients",
+        "format": "integer"
+      },
+      {
+        "metric_id": "overview_expected_onsets",
+        "label": "Expected onset cases",
+        "data_file": "project_summary.json",
+        "field": "total_positives",
+        "format": "integer"
+      },
+      {
+        "metric_id": "overview_positive_rate",
+        "label": "Observed positive rate",
+        "data_file": "project_summary.json",
+        "field": "positive_rate",
+        "format": "percent"
+      },
+      {
+        "metric_id": "overview_partner_sites",
+        "label": "Partner sites",
+        "data_file": "project_summary.json",
+        "field": "federated_clients",
+        "format": "integer"
+      },
+      {
+        "metric_id": "overview_fl_auroc",
+        "label": "Collaborative AUROC",
+        "data_file": "project_summary.json",
+        "field": "best_federated_auroc",
+        "format": "decimal"
+      },
+      {
+        "metric_id": "overview_fl_recall",
+        "label": "Collaborative recall",
+        "data_file": "project_summary.json",
+        "field": "best_federated_recall",
+        "format": "percent"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "overview_population_composition",
+        "title": "Population Composition",
+        "type": "donut",
+        "data_file": "project_summary.json",
+        "fields": [
+          "total_positives",
+          "total_negatives"
+        ],
+        "purpose": "Show the rare-event class balance without using accuracy."
+      },
+      {
+        "chart_id": "overview_model_status",
+        "title": "Current Model Status",
+        "type": "status_cards",
+        "data_file": "model_registry.json",
+        "fields": [
+          "model_id",
+          "training_mode",
+          "calibration_status",
+          "product_role"
+        ],
+        "purpose": "Show which models are benchmarks, calibrated candidates, and proof-of-concept collaborative models."
+      },
+      {
+        "chart_id": "overview_partner_population",
+        "title": "Partner Site Population",
+        "type": "horizontal_bar",
+        "data_file": "fl_client_summary.csv",
+        "x": "population",
+        "y": "site_id",
+        "purpose": "Show aggregate population contribution by synthetic partner site."
+      }
+    ]
+  },
+  {
+    "page": "Risk Population",
+    "route": "/risk-population",
+    "metrics": [
+      {
+        "metric_id": "risk_top_1_placeholder",
+        "label": "Top 1% band",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "top_k_percent",
+        "format": "percent",
+        "status": "pending_final_risk_band_scoring"
+      },
+      {
+        "metric_id": "risk_top_5_placeholder",
+        "label": "Top 5% band",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "top_k_percent",
+        "format": "percent",
+        "status": "pending_final_risk_band_scoring"
+      },
+      {
+        "metric_id": "risk_threshold_precision",
+        "label": "Precision by threshold",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "precision",
+        "format": "percent"
+      },
+      {
+        "metric_id": "risk_threshold_recall",
+        "label": "Recall by threshold",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "recall_sensitivity",
+        "format": "percent"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "risk_threshold_tradeoff",
+        "title": "Threshold Tradeoff",
+        "type": "multi_line",
+        "data_file": "threshold_analysis_summary.csv",
+        "x": "threshold",
+        "y": [
+          "precision",
+          "recall_sensitivity",
+          "specificity"
+        ],
+        "purpose": "Show how threshold selection changes precision, recall, and specificity."
+      },
+      {
+        "chart_id": "risk_predicted_positive_rate",
+        "title": "Workload by Threshold",
+        "type": "line",
+        "data_file": "threshold_analysis_summary.csv",
+        "x": "threshold",
+        "y": "predicted_positive_rate",
+        "purpose": "Show how much of the population would be selected at each threshold."
+      },
+      {
+        "chart_id": "risk_band_table",
+        "title": "Risk Band Summary",
+        "type": "table",
+        "data_file": "threshold_analysis_summary.csv",
+        "fields": [
+          "planning_mode",
+          "top_k_percent",
+          "precision",
+          "recall_sensitivity",
+          "predicted_positive_rate",
+          "status"
+        ],
+        "purpose": "Provide the schema for future top-k risk bands."
+      }
+    ]
+  },
+  {
+    "page": "Intervention Planner",
+    "route": "/intervention-planner",
+    "metrics": [
+      {
+        "metric_id": "planner_selected_population_rate",
+        "label": "Selected population rate",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "predicted_positive_rate",
+        "format": "percent"
+      },
+      {
+        "metric_id": "planner_expected_captured",
+        "label": "Expected positives captured",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "true_positives",
+        "format": "integer"
+      },
+      {
+        "metric_id": "planner_false_positives",
+        "label": "Expected false positives",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "false_positives",
+        "format": "integer"
+      },
+      {
+        "metric_id": "planner_missed_positives",
+        "label": "Missed positives",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "false_negatives",
+        "format": "integer"
+      },
+      {
+        "metric_id": "planner_number_needed_to_review",
+        "label": "Number needed to review",
+        "data_file": "threshold_analysis_summary.csv",
+        "field": "precision",
+        "format": "derived_inverse"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "planner_capacity_curve",
+        "title": "Capacity Curve",
+        "type": "combo_line_bar",
+        "data_file": "threshold_analysis_summary.csv",
+        "x": "threshold",
+        "bar_y": "predicted_positive_rate",
+        "line_y": "recall_sensitivity",
+        "purpose": "Support capacity planning by connecting workload and captured cases."
+      },
+      {
+        "chart_id": "planner_confusion_counts",
+        "title": "Expected Outcome Counts",
+        "type": "stacked_bar",
+        "data_file": "threshold_analysis_summary.csv",
+        "x": "threshold",
+        "y": [
+          "true_positives",
+          "false_positives",
+          "false_negatives"
+        ],
+        "purpose": "Show the operational tradeoff between captured cases, review burden, and missed cases."
+      }
+    ]
+  },
+  {
+    "page": "Cohort Insights",
+    "route": "/cohort-insights",
+    "metrics": [
+      {
+        "metric_id": "cohort_top_driver",
+        "label": "Top aggregate driver",
+        "data_file": "feature_importance_summary.csv",
+        "field": "feature",
+        "format": "text"
+      },
+      {
+        "metric_id": "cohort_driver_group",
+        "label": "Driver group",
+        "data_file": "feature_importance_summary.csv",
+        "field": "product_group",
+        "format": "text"
+      },
+      {
+        "metric_id": "cohort_feature_rank",
+        "label": "Feature rank",
+        "data_file": "feature_importance_summary.csv",
+        "field": "rank_gain",
+        "format": "integer"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "cohort_feature_importance",
+        "title": "Top Risk Drivers",
+        "type": "horizontal_bar",
+        "data_file": "feature_importance_summary.csv",
+        "x": "importance_gain",
+        "y": "feature",
+        "purpose": "Explain aggregate high-risk cohort drivers without implying causality."
+      },
+      {
+        "chart_id": "cohort_driver_groups",
+        "title": "Driver Categories",
+        "type": "bar",
+        "data_file": "feature_importance_summary.csv",
+        "x": "product_group",
+        "y": "count",
+        "aggregation": "count_rows",
+        "purpose": "Group drivers into clinical and utilization categories for end users."
+      }
+    ]
+  },
+  {
+    "page": "Partner Sites",
+    "route": "/partner-sites",
+    "metrics": [
+      {
+        "metric_id": "site_population",
+        "label": "Site population",
+        "data_file": "fl_client_summary.csv",
+        "field": "population",
+        "format": "integer"
+      },
+      {
+        "metric_id": "site_positive_count",
+        "label": "Site positives",
+        "data_file": "fl_client_summary.csv",
+        "field": "positive_count",
+        "format": "integer"
+      },
+      {
+        "metric_id": "site_positive_rate",
+        "label": "Site positive rate",
+        "data_file": "fl_client_summary.csv",
+        "field": "positive_rate",
+        "format": "percent"
+      },
+      {
+        "metric_id": "site_validation_status",
+        "label": "Validation status",
+        "data_file": "fl_client_summary.csv",
+        "field": "validation_status",
+        "format": "status"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "site_population_bar",
+        "title": "Population by Site",
+        "type": "horizontal_bar",
+        "data_file": "fl_client_summary.csv",
+        "x": "population",
+        "y": "site_id",
+        "purpose": "Show aggregate participation scale by synthetic site."
+      },
+      {
+        "chart_id": "site_positive_rate_dot",
+        "title": "Positive Rate by Site",
+        "type": "dot_plot",
+        "data_file": "fl_client_summary.csv",
+        "x": "positive_rate",
+        "y": "site_id",
+        "purpose": "Compare site class balance using aggregate rates."
+      },
+      {
+        "chart_id": "site_validation_matrix",
+        "title": "Site Readiness",
+        "type": "status_table",
+        "data_file": "fl_client_summary.csv",
+        "fields": [
+          "site_id",
+          "validation_status",
+          "participation_status",
+          "privacy_notes"
+        ],
+        "purpose": "Show partner readiness and privacy-safe participation status."
+      }
+    ]
+  },
+  {
+    "page": "Trust & Validation",
+    "route": "/trust-validation",
+    "metrics": [
+      {
+        "metric_id": "trust_model_auroc",
+        "label": "AUROC",
+        "data_file": "centralized_vs_federated_metrics.csv",
+        "field": "AUROC",
+        "format": "decimal"
+      },
+      {
+        "metric_id": "trust_model_auprc",
+        "label": "AUPRC",
+        "data_file": "centralized_vs_federated_metrics.csv",
+        "field": "AUPRC",
+        "format": "decimal"
+      },
+      {
+        "metric_id": "trust_model_brier",
+        "label": "Brier score",
+        "data_file": "centralized_vs_federated_metrics.csv",
+        "field": "Brier",
+        "format": "decimal"
+      },
+      {
+        "metric_id": "trust_temporal_auroc",
+        "label": "Temporal AUROC",
+        "data_file": "temporal_validation_metrics.csv",
+        "field": "AUROC",
+        "format": "decimal"
+      },
+      {
+        "metric_id": "trust_validation_status",
+        "label": "Validation engine status",
+        "data_file": "validation_engine_summary.json",
+        "field": "current_status",
+        "format": "status"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "trust_model_comparison",
+        "title": "Model Comparison",
+        "type": "grouped_bar",
+        "data_file": "centralized_vs_federated_metrics.csv",
+        "x": "model_id",
+        "y": [
+          "AUROC",
+          "AUPRC",
+          "Brier"
+        ],
+        "purpose": "Compare model evidence directionally across centralized and collaborative candidates."
+      },
+      {
+        "chart_id": "trust_temporal_stability",
+        "title": "Temporal Stability",
+        "type": "multi_line",
+        "data_file": "temporal_validation_metrics.csv",
+        "x": "prediction_year",
+        "series": "probability_version",
+        "y": [
+          "AUROC",
+          "AUPRC",
+          "Brier score"
+        ],
+        "purpose": "Show rolling-window performance and calibration stability."
+      },
+      {
+        "chart_id": "trust_calibration",
+        "title": "Calibration Comparison",
+        "type": "grouped_bar",
+        "data_file": "calibration_summary.csv",
+        "x": "probability_version",
+        "y": [
+          "Brier score",
+          "log loss"
+        ],
+        "purpose": "Show why calibrated probabilities are preferred for risk communication."
+      },
+      {
+        "chart_id": "trust_collaborative_training_trend",
+        "title": "Collaborative Training Trend",
+        "type": "multi_line",
+        "data_file": "fl_training_rounds.csv",
+        "x": "round",
+        "y": [
+          "global_weighted_auroc",
+          "global_weighted_auprc",
+          "global_weighted_brier"
+        ],
+        "purpose": "Show aggregate proof-of-concept training behavior without exposing low-level internals."
+      }
+    ]
+  },
+  {
+    "page": "Reports",
+    "route": "/reports",
+    "metrics": [
+      {
+        "metric_id": "reports_available_count",
+        "label": "Available report types",
+        "data_file": "dashboard_page_specs.json",
+        "field": "reports",
+        "format": "count"
+      },
+      {
+        "metric_id": "reports_last_generated",
+        "label": "Data package generated",
+        "data_file": "dashboard_manifest.json",
+        "field": "generated_at",
+        "format": "datetime"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "reports_catalog",
+        "title": "Governance Reports",
+        "type": "action_table",
+        "data_file": "dashboard_page_specs.json",
+        "fields": [
+          "report_name",
+          "audience",
+          "source_files"
+        ],
+        "purpose": "Let users download governance-ready reports from aggregate sources."
+      }
+    ],
+    "reports": [
+      {
+        "report_name": "Executive Summary",
+        "audience": "Executives",
+        "source_files": [
+          "project_summary.json",
+          "limitations.json"
+        ]
+      },
+      {
+        "report_name": "Population Risk Report",
+        "audience": "Population health managers",
+        "source_files": [
+          "threshold_analysis_summary.csv"
+        ]
+      },
+      {
+        "report_name": "Intervention Planning Report",
+        "audience": "Population health managers",
+        "source_files": [
+          "threshold_analysis_summary.csv"
+        ]
+      },
+      {
+        "report_name": "Partner Site Summary",
+        "audience": "Partner site reviewers",
+        "source_files": [
+          "fl_client_summary.csv"
+        ]
+      },
+      {
+        "report_name": "Trust & Validation Report",
+        "audience": "Governance reviewers",
+        "source_files": [
+          "centralized_vs_federated_metrics.csv",
+          "temporal_validation_metrics.csv",
+          "calibration_summary.csv"
+        ]
+      },
+      {
+        "report_name": "Governance & Limitations Report",
+        "audience": "Governance reviewers",
+        "source_files": [
+          "limitations.json",
+          "validation_engine_summary.json"
+        ]
+      }
+    ]
+  },
+  {
+    "page": "Settings",
+    "route": "/settings",
+    "metrics": [
+      {
+        "metric_id": "settings_use_case",
+        "label": "Use case",
+        "data_file": "project_summary.json",
+        "field": "use_case",
+        "format": "text"
+      },
+      {
+        "metric_id": "settings_prediction_horizon",
+        "label": "Prediction horizon",
+        "data_file": "project_summary.json",
+        "field": "prediction_horizon",
+        "format": "text"
+      },
+      {
+        "metric_id": "settings_model_version",
+        "label": "Model version",
+        "data_file": "model_registry.json",
+        "field": "model_id",
+        "format": "select"
+      }
+    ],
+    "charts": [
+      {
+        "chart_id": "settings_model_registry",
+        "title": "Model Registry",
+        "type": "table",
+        "data_file": "model_registry.json",
+        "fields": [
+          "model_id",
+          "model_name",
+          "training_mode",
+          "calibration_status",
+          "product_role"
+        ],
+        "purpose": "Support product-level model selection without exposing technical training controls."
+      }
+    ]
+  }
+]

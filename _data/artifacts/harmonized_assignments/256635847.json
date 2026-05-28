@@ -1,0 +1,78 @@
+{
+  "patient_id": "256635847",
+  "dominant_tier": "P5",
+  "years_observed": 5,
+  "trajectory": [
+    {
+      "year": 2010,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 90,
+      "gender": "M",
+      "conditions": 9,
+      "prescriptions": 9,
+      "admissions": 3,
+      "outpatient_visits": 3,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2011,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 92,
+      "gender": "M",
+      "conditions": 10,
+      "prescriptions": 12,
+      "admissions": 8,
+      "outpatient_visits": 5,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2013,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 93,
+      "gender": "M",
+      "conditions": 8,
+      "prescriptions": 3,
+      "admissions": 1,
+      "outpatient_visits": 16,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2014,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 95,
+      "gender": "M",
+      "conditions": 14,
+      "prescriptions": 3,
+      "admissions": 3,
+      "outpatient_visits": 17,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2015,
+      "phenotype_id": "P5",
+      "phenotype_label": "High Complexity",
+      "age": 95,
+      "gender": "M",
+      "conditions": 16,
+      "prescriptions": 0,
+      "admissions": 5,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 5 years (2010-2015). Risk profile remained in High Complexity. Trajectory classified as mostly stable (2 distinct tiers)."
+}

@@ -1,0 +1,1004 @@
+{
+  "patients": [
+    {
+      "patient_id": "327160425",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "228870575",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "212822892",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "346175613",
+      "dominant_tier": "P1",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "259343404",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "253722724",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "249696851",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "234118524",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "345224237",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "227254493",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "334075163",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "346011232",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "309622091",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "224346344",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "318031013",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "286660031",
+      "dominant_tier": "P1",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "214067758",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "213703631",
+      "dominant_tier": "P1",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "225611210",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "248837404",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "251431369",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "302179343",
+      "dominant_tier": "P1",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "320195129",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "213108964",
+      "dominant_tier": "P1",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "312608543",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "245131143",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "341410403",
+      "dominant_tier": "P1",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "329109213",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "338659035",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "309550886",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "286213730",
+      "dominant_tier": "P1",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "249169009",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "291711616",
+      "dominant_tier": "P1",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "317821587",
+      "dominant_tier": "P1",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "259931430",
+      "dominant_tier": "P1",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "209406041",
+      "dominant_tier": "P1",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "349380308",
+      "dominant_tier": "P1",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "358144548",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "237869421",
+      "dominant_tier": "P1",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "338067393",
+      "dominant_tier": "P1",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "334480183",
+      "dominant_tier": "P2",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "309917283",
+      "dominant_tier": "P2",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "291263225",
+      "dominant_tier": "P2",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "254594869",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "272512481",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "308827767",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "238698549",
+      "dominant_tier": "P2",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "235884543",
+      "dominant_tier": "P2",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "321731094",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "237051794",
+      "dominant_tier": "P2",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "315497232",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "310996981",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "287247558",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "221148888",
+      "dominant_tier": "P2",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "345447661",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "245450899",
+      "dominant_tier": "P2",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "321326878",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "231740991",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "295838517",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "316324645",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "265634899",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "228943093",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "221884647",
+      "dominant_tier": "P2",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "276272370",
+      "dominant_tier": "P2",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "294711653",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "232041033",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "277700407",
+      "dominant_tier": "P2",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "238373750",
+      "dominant_tier": "P2",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "321785499",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "291289539",
+      "dominant_tier": "P2",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "343674928",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "317277812",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "256746686",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "318833037",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "314402158",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "270775134",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "287985500",
+      "dominant_tier": "P2",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "229506736",
+      "dominant_tier": "P2",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "259275352",
+      "dominant_tier": "P2",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "281302488",
+      "dominant_tier": "P2",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "250348024",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "327300957",
+      "dominant_tier": "P3",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "305977320",
+      "dominant_tier": "P3",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "277790590",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "351735866",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "264862314",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "291753258",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "222648381",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "267290110",
+      "dominant_tier": "P3",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "216484403",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "289472583",
+      "dominant_tier": "P3",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "311579620",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "277228545",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "225275988",
+      "dominant_tier": "P3",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "262637743",
+      "dominant_tier": "P3",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "354344911",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "289245062",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "263029233",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "336802462",
+      "dominant_tier": "P3",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "310101529",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "326439733",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "245061413",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "276483422",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "244233354",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "271777083",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "352849087",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "347085650",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "275894685",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "318639932",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "311092031",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "301536723",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "264784795",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "243878343",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "339585056",
+      "dominant_tier": "P3",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "335371169",
+      "dominant_tier": "P3",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "231580580",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "220397272",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "236432422",
+      "dominant_tier": "P3",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "247601815",
+      "dominant_tier": "P3",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "249484245",
+      "dominant_tier": "P3",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "355701823",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "299497361",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "337362107",
+      "dominant_tier": "P4",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "222112938",
+      "dominant_tier": "P4",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "291430298",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "290742781",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "337239643",
+      "dominant_tier": "P4",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "309497093",
+      "dominant_tier": "P4",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "322750546",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "262627867",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "327898498",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "210738629",
+      "dominant_tier": "P4",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "355681095",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "233144388",
+      "dominant_tier": "P4",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "355988624",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "324419968",
+      "dominant_tier": "P4",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "265955381",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "347138031",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "281735833",
+      "dominant_tier": "P4",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "232532180",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "271688598",
+      "dominant_tier": "P4",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "302176775",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "242442097",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "306353035",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "208916644",
+      "dominant_tier": "P4",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "265190863",
+      "dominant_tier": "P4",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "316513144",
+      "dominant_tier": "P4",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "246884842",
+      "dominant_tier": "P4",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "318046035",
+      "dominant_tier": "P4",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "231433943",
+      "dominant_tier": "P4",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "343750316",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "272737589",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "346685570",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "318043278",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "340096707",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "251251464",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "241338993",
+      "dominant_tier": "P4",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "289027657",
+      "dominant_tier": "P4",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "243183579",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "324934988",
+      "dominant_tier": "P4",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "208385615",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "302962158",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "350979953",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "213946092",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "241038253",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "314202783",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "298172902",
+      "dominant_tier": "P5",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "278527322",
+      "dominant_tier": "P5",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "225356845",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "278898101",
+      "dominant_tier": "P5",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "231448161",
+      "dominant_tier": "P5",
+      "years_observed": 6
+    },
+    {
+      "patient_id": "233402462",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "350246631",
+      "dominant_tier": "P5",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "228648767",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "245150094",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "245988583",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "347131908",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "256635847",
+      "dominant_tier": "P5",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "285936159",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "331922271",
+      "dominant_tier": "P5",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "270514252",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "267353020",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "299292207",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "324898815",
+      "dominant_tier": "P5",
+      "years_observed": 3
+    },
+    {
+      "patient_id": "317254860",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "336251750",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "340088131",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "243794540",
+      "dominant_tier": "P5",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "280948979",
+      "dominant_tier": "P5",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "274203552",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "227131901",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "307024437",
+      "dominant_tier": "P5",
+      "years_observed": 5
+    },
+    {
+      "patient_id": "214397260",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "275752280",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "272897319",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "210298282",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "229194212",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "225639669",
+      "dominant_tier": "P5",
+      "years_observed": 7
+    },
+    {
+      "patient_id": "275435105",
+      "dominant_tier": "P5",
+      "years_observed": 4
+    },
+    {
+      "patient_id": "228140780",
+      "dominant_tier": "P5",
+      "years_observed": 6
+    }
+  ]
+}

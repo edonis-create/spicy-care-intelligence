@@ -1,0 +1,10 @@
+[
+  {
+    "rounds_observed": 10,
+    "last_max_centroid_shift": 0.027872405942596597,
+    "stop_reason": "max_rounds_reached",
+    "year": 2010,
+    "k": 4,
+    "workspace": "_nvflare_sim_workspace_kmeans_2010_inertia"
+  }
+]

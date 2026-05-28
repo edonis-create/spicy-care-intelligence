@@ -1,0 +1,7 @@
+{
+  "year": 2015,
+  "final_global_inertia": 35399291.52877952,
+  "stabilized": false,
+  "stopped_reason": "max_rounds_reached",
+  "rounds_completed": 15
+}

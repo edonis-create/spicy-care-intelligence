@@ -1,0 +1,63 @@
+{
+  "contract_id": "uc1-diabetes-enhanced-patient-v1",
+  "contract_version": "1.0.0",
+  "source": "data_contact_manifest.json",
+  "validation_groups": [
+    {
+      "name": "Schema validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "Data type validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "Missingness validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "Range validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "StandardScaler validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "log1p reconstruction validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "Diagnosis chapter consistency validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "Age standardization validation",
+      "status": "implementation_pending"
+    },
+    {
+      "name": "Per-year distribution drift validation",
+      "status": "implementation_pending"
+    }
+  ],
+  "severity_levels": [
+    "PASS",
+    "WARNING",
+    "FAIL"
+  ],
+  "current_status": "design_ready",
+  "implementation_status": "Dashboard summary generated; executable partner/site validation engine is a roadmap item.",
+  "dashboard_display": "Show group status, severity, last validation time, blocking failures, and warnings.",
+  "api_endpoint": "/api/validation-engine",
+  "expected_output_format": {
+    "site_id": "string",
+    "overall_status": "PASS | WARNING | FAIL",
+    "checks": [
+      {
+        "group": "Schema validation",
+        "status": "PASS",
+        "message": "Aggregate validation result"
+      }
+    ]
+  }
+}

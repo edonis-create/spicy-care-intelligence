@@ -1,0 +1,64 @@
+{
+  "patient_id": "334480183",
+  "dominant_tier": "P2",
+  "years_observed": 4,
+  "trajectory": [
+    {
+      "year": 2010,
+      "phenotype_id": "P2",
+      "phenotype_label": "Moderate Risk",
+      "age": 61,
+      "gender": "M",
+      "conditions": 3,
+      "prescriptions": 14,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2011,
+      "phenotype_id": "P2",
+      "phenotype_label": "Moderate Risk",
+      "age": 62,
+      "gender": "M",
+      "conditions": 5,
+      "prescriptions": 21,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2012,
+      "phenotype_id": "P3",
+      "phenotype_label": "High Medication Need",
+      "age": 63,
+      "gender": "M",
+      "conditions": 12,
+      "prescriptions": 36,
+      "admissions": 2,
+      "outpatient_visits": 7,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2013,
+      "phenotype_id": "P3",
+      "phenotype_label": "High Medication Need",
+      "age": 64,
+      "gender": "M",
+      "conditions": 14,
+      "prescriptions": 32,
+      "admissions": 3,
+      "outpatient_visits": 2,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 4 years (2010-2013). Risk profile escalated from Moderate Risk to High Medication Need. Trajectory classified as mostly stable (2 distinct tiers)."
+}

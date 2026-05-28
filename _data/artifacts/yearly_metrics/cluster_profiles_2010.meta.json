@@ -1,0 +1,44 @@
+{
+  "year": 2010,
+  "k": 4,
+  "d": 19,
+  "feature_names_ordered": [
+    "AGE_std",
+    "GENDER_binary",
+    "dx_unique_count_log",
+    "dx_chapter_A_B_uniq",
+    "dx_chapter_C_D_uniq",
+    "dx_chapter_E_uniq",
+    "dx_chapter_I_uniq",
+    "dx_chapter_J_uniq",
+    "dx_chapter_K_uniq",
+    "dx_chapter_N_uniq",
+    "dx_chapter_other_uniq",
+    "inpatient_admissions_log",
+    "has_inpatient",
+    "outpatient_visits_log",
+    "procedure_count_log",
+    "prescription_count_log",
+    "rx_atc_uniq_count_log",
+    "polypharmacy_flag",
+    "chronic_rx_flag"
+  ],
+  "binary_feature_names": [
+    "GENDER_binary",
+    "chronic_rx_flag",
+    "has_inpatient",
+    "polypharmacy_flag"
+  ],
+  "n_total": 5298520,
+  "empty_cluster_ids": [],
+  "tiny_cluster_ids": [],
+  "tiny_cluster_threshold": 30,
+  "exactness": {
+    "mean": "exact_pooled_multiset",
+    "std": "exact_pooled_multiset_from_sums_and_sum_squares",
+    "prevalence_binary": "exact_equals_mean_for_0_1_encoding"
+  },
+  "warnings": [],
+  "csv_path": "/mnt/c/Users/Admin/Desktop/heliX/data-preparation/federated_learning/artifacts/yearly_metrics/cluster_profiles_2010.csv",
+  "num_clients_aggregated": 5
+}

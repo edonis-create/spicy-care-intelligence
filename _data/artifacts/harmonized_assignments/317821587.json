@@ -1,0 +1,50 @@
+{
+  "patient_id": "317821587",
+  "dominant_tier": "P1",
+  "years_observed": 3,
+  "trajectory": [
+    {
+      "year": 2013,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 17,
+      "gender": "M",
+      "conditions": 1,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2014,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 18,
+      "gender": "M",
+      "conditions": 2,
+      "prescriptions": 1,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2015,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 19,
+      "gender": "M",
+      "conditions": 1,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 3 years (2013-2015). Risk profile remained in Low Risk. Trajectory classified as stable (1 distinct tier)."
+}

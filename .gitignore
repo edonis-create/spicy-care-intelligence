@@ -1,0 +1,8 @@
+node_modules/
+frontend/dist/
+__pycache__/
+*.pyc
+*.parquet
+*.env
+cloudflared.exe
+.DS_Store

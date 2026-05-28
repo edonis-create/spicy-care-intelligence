@@ -1,0 +1,16 @@
+{
+  "product_name": "SPICY CareRisk",
+  "use_case": "UC1 Broad Diabetes Onset Prediction",
+  "disease_definition": "Broad diabetes = ICD-10/BNO diagnosis groups E10, E11, E12, E13, E14.",
+  "prediction_horizon": "12 months",
+  "product_status": "Product and engineering handoff package",
+  "total_patients": 5840319,
+  "total_positives": 18827,
+  "total_negatives": 5821492,
+  "positive_rate": 0.003223625284851735,
+  "federated_clients": 4,
+  "best_federated_auroc": 0.8251311346968341,
+  "best_federated_recall": 0.852816153028693,
+  "primary_product_message": "SPICY CareRisk helps healthcare organizations identify elevated chronic disease risk, plan prevention capacity, validate partner/site data, and report model trust using aggregate, privacy-conscious evidence.",
+  "current_limitations_summary": "Current collaborative training evidence is based on a synthetic random four-client simulation and should be treated as proof of concept until real partner-site validation and secure production deployment are completed."
+}

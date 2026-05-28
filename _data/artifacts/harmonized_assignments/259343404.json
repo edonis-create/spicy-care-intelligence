@@ -1,0 +1,92 @@
+{
+  "patient_id": "259343404",
+  "dominant_tier": "P1",
+  "years_observed": 6,
+  "trajectory": [
+    {
+      "year": 2011,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 16,
+      "gender": "M",
+      "conditions": 3,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 7,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2012,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 17,
+      "gender": "M",
+      "conditions": 4,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 4,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2013,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 18,
+      "gender": "M",
+      "conditions": 2,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2014,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 19,
+      "gender": "M",
+      "conditions": 2,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2015,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 20,
+      "gender": "M",
+      "conditions": 1,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 2,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    },
+    {
+      "year": 2016,
+      "phenotype_id": "P1",
+      "phenotype_label": "Low Risk",
+      "age": 21,
+      "gender": "M",
+      "conditions": 1,
+      "prescriptions": 0,
+      "admissions": 0,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 6 years (2011-2016). Risk profile remained in Low Risk. Trajectory classified as stable (1 distinct tier)."
+}

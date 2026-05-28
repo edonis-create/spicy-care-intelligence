@@ -1,0 +1,78 @@
+{
+  "patient_id": "318046035",
+  "dominant_tier": "P4",
+  "years_observed": 5,
+  "trajectory": [
+    {
+      "year": 2010,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 67,
+      "gender": "F",
+      "conditions": 18,
+      "prescriptions": 30,
+      "admissions": 4,
+      "outpatient_visits": 0,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2011,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 68,
+      "gender": "F",
+      "conditions": 14,
+      "prescriptions": 36,
+      "admissions": 4,
+      "outpatient_visits": 9,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2012,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 69,
+      "gender": "F",
+      "conditions": 17,
+      "prescriptions": 34,
+      "admissions": 4,
+      "outpatient_visits": 13,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2013,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 70,
+      "gender": "F",
+      "conditions": 18,
+      "prescriptions": 28,
+      "admissions": 3,
+      "outpatient_visits": 19,
+      "polypharmacy": true,
+      "chronic_rx": true,
+      "confidence": "high"
+    },
+    {
+      "year": 2014,
+      "phenotype_id": "P4",
+      "phenotype_label": "Chronic, Stable",
+      "age": 71,
+      "gender": "F",
+      "conditions": 13,
+      "prescriptions": 0,
+      "admissions": 1,
+      "outpatient_visits": 1,
+      "polypharmacy": false,
+      "chronic_rx": false,
+      "confidence": "high"
+    }
+  ],
+  "interpretation": "Patient observed across 5 years (2010-2014). Risk profile remained in Chronic, Stable. Trajectory classified as stable (1 distinct tier)."
+}

@@ -1,0 +1,33 @@
+column_name,data_type,polars_dtype,description,sensitive,in_app_dataset
+demo_patient_id,string,String,Demo-safe patient identifier (DEMO-XXXXXX format). No real patient identifiers.,false,true
+predicted_risk,float,Float64,Predicted probability of C09 non-adherence in 2016 (centralized logistic baseline).,false,true
+risk_group,string,String,"Risk tier: Low (<0.30), Medium (0.30-0.60), High (0.60-0.80), Very High (>=0.80).",false,true
+actual_label,int,Int8,"Observed test-set outcome: 1=non-adherent in 2016 (PDC<0.80), 0=adherent.",false,true
+actual_outcome_text,string,String,Human-readable observed outcome: 'Non-adherent' or 'Adherent'.,false,true
+actual_pdc,float,Float64,PDC-based adherence measure in the 2016 prediction window. PDC<0.80 => non-adherent.,false,true
+age_group_2015,string,String,"Age group as of 2015 (categorical, derived from birth date).",false,true
+age_at_2015,float,Int32,"Age of patient in 2015 (years, continuous feature).",false,true
+megye_mode_2015,string,String,Most frequent Hungarian county (megye) of C09 prescription fill in 2015.,false,true
+client_id,string,String,Federated learning client assignment (derived from regional split plan).,false,true
+c09_2015_pdc_observed,float,Float64,Observed PDC for C09 medications in the 2015 observation window.,false,true
+c09_2015_pdc_low_80_flag,int,Int64,Flag: 1 if 2015 observed PDC < 0.80 (prior-year adherence risk indicator).,false,true
+c09_2015_records,int,UInt32,Number of C09 prescription records in the 2015 observation window.,false,true
+c09_2015_gap_count_30d,int,Int64,Number of gaps >= 30 days in C09 medication supply during 2015.,false,true
+c09_2015_gap_count_60d,int,Int64,Number of gaps >= 60 days in C09 medication supply during 2015.,false,true
+c09_2015_longest_gap_days,float,Int64,Longest gap in days in C09 medication supply during 2015.,false,true
+c09_2015_days_since_last_fill_to_obs_end,float,Int64,Days from last C09 fill to end of the 2015 observation window.,false,true
+c09_2015_has_q4_fill,int,Int8,Flag: 1 if patient had a C09 fill in Q4 2015 (October-December).,false,true
+all_rx_2015_records,int,UInt32,Total prescription records across all ATC groups in 2015.,false,true
+all_rx_2015_unique_atc_l3,int,UInt32,Number of unique ATC level-3 medication groups dispensed in 2015.,false,true
+all_rx_2015_unique_ttt,int,UInt32,Number of unique TTT active substance codes dispensed in 2015.,false,true
+all_rx_2015_polypharmacy_atc_l3_ge_5,int,Int8,Flag: 1 if patient had >= 5 unique ATC level-3 groups (polypharmacy indicator).,false,true
+all_rx_2015_polypharmacy_atc_l3_ge_10,int,Int8,Flag: 1 if patient had >= 10 unique ATC level-3 groups (high polypharmacy).,false,true
+cv_2015_records,int,UInt32,Number of cardiovascular (ATC C) prescription records in 2015.,false,true
+cv_2015_c09_share_of_all_records,float,Float64,Share of C09 records among all cardiovascular prescription records in 2015.,false,true
+dx_2015_has_I_circulatory,int,Int8,Flag: 1 if patient had any ICD-10 chapter I (circulatory system) diagnosis in 2015.,false,true
+dx_2015_has_E_endocrine,int,Int8,Flag: 1 if patient had any ICD-10 chapter E (endocrine) diagnosis in 2015.,false,true
+dx_2015_has_N_genitourinary,int,Int8,Flag: 1 if patient had any ICD-10 chapter N (genitourinary) diagnosis in 2015.,false,true
+dx_2015_has_J_respiratory,int,Int8,Flag: 1 if patient had any ICD-10 chapter J (respiratory) diagnosis in 2015.,false,true
+prediction_correct,int,Int8,"1 if predicted label (threshold 0.50) matches actual_label, 0 otherwise.",false,true
+prediction_error_type,string,String,"Classification outcome at threshold 0.50: true_positive, false_positive, true_negative, or false_negative.",false,true
+model_source,string,String,Source model used for this prediction: 'centralized_logistic_baseline'.,false,true

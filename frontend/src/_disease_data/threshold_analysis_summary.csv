@@ -1,0 +1,10 @@
+threshold,precision,recall_sensitivity,specificity,f1,true_positives,false_positives,true_negatives,false_negatives,predicted_positive_rate,planning_mode,top_k_percent,status,notes
+0.001,0.018481984236820667,1.0,0.0,0.0362931981573926,3766,200000,0,0,1.0,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.002,0.018481984236820667,1.0,0.0,0.0362931981573926,3766,200000,0,0,1.0,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.005,0.03209459459459459,0.9636218799787573,0.452785,0.06212020061966141,3629,109443,90557,137,0.5549110253918711,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.01,0.04055733156402678,0.8927243759957515,0.602335,0.07758968855655947,3362,79533,120467,404,0.40681467958344375,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.02,0.04848679321759103,0.7623473181093999,0.718295,0.09117469592556131,2871,56341,143659,895,0.2905882237468469,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.05,0.06451348471186162,0.4179500796601168,0.88588,0.11177389575344411,1574,22824,177176,2192,0.11973538274295024,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.1,0.11065292096219931,0.04275092936802974,0.99353,0.06167400881057269,161,1294,198706,3605,0.00714054356467713,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.2,0.0,0.0,1.0,0.0,0,0,200000,3766,0.0,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.
+0.5,0.0,0.0,1.0,0.0,0,0,200000,3766,0.0,threshold,,available,Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.

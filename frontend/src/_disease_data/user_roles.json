@@ -1,0 +1,64 @@
+[
+  {
+    "role_id": "executive_viewer",
+    "role_name": "Healthcare Executives / Business Stakeholders",
+    "needs": [
+      "Impact summary",
+      "High-level KPIs",
+      "Trusted evidence",
+      "Business value",
+      "Privacy-preserving collaboration story"
+    ],
+    "primary_pages": [
+      "Overview",
+      "Trust & Validation",
+      "Reports"
+    ]
+  },
+  {
+    "role_id": "population_health_manager",
+    "role_name": "Population Health Managers",
+    "needs": [
+      "Risk cohorts",
+      "Top-k groups",
+      "Intervention capacity planning",
+      "Threshold explorer",
+      "Cohort summaries"
+    ],
+    "primary_pages": [
+      "Risk Population",
+      "Intervention Planner",
+      "Cohort Insights"
+    ]
+  },
+  {
+    "role_id": "clinical_prevention_user",
+    "role_name": "Clinical Prevention / Care Management Teams",
+    "needs": [
+      "Aggregate risk cohort insights",
+      "Risk drivers",
+      "Expected workload",
+      "Intervention planning support",
+      "Future secure worklist option"
+    ],
+    "primary_pages": [
+      "Cohort Insights",
+      "Intervention Planner",
+      "Reports"
+    ]
+  },
+  {
+    "role_id": "partner_site_reviewer",
+    "role_name": "Partner Institution / Site Reviewers",
+    "needs": [
+      "Site participation summary",
+      "Data validation status",
+      "Aggregate site summary",
+      "Trust and readiness status"
+    ],
+    "primary_pages": [
+      "Partner Sites",
+      "Trust & Validation"
+    ]
+  }
+]

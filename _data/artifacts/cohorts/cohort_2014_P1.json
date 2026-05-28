@@ -1,0 +1,46 @@
+{
+  "start_year": 2014,
+  "start_phenotype": "P1",
+  "canonical_start_phenotype": "P1",
+  "cohort_size": 2402412,
+  "yearly_distribution": [
+    {
+      "year": 2014,
+      "distribution": {
+        "P1": 100.0,
+        "P2": 0.0,
+        "P3": 0.0,
+        "P4": 0.0,
+        "P5": 0.0
+      },
+      "cohort_size": 2402412
+    },
+    {
+      "year": 2015,
+      "distribution": {
+        "P1": 83.08,
+        "P2": 8.82,
+        "P3": 0.59,
+        "P4": 7.1,
+        "P5": 0.41
+      },
+      "cohort_size": 1428416
+    },
+    {
+      "year": 2016,
+      "distribution": {
+        "P1": 85.51,
+        "P2": 11.43,
+        "P3": 0.0,
+        "P4": 2.48,
+        "P5": 0.59
+      },
+      "cohort_size": 1357419
+    }
+  ],
+  "summary": {
+    "persisted": 83.1,
+    "progressed": 16.9,
+    "improved": 0.0
+  }
+}

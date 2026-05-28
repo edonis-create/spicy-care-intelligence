@@ -1,0 +1,128 @@
+{
+  "GET /api/project-summary": {
+    "project_name": "MTA Healthcare Disease Prediction",
+    "use_case": "UC1 Broad Diabetes Onset Prediction",
+    "disease_definition": "ICD-10/BNO E10-E14 broad diabetes groups",
+    "observation_window": "Two-year observation windows in temporal validation; latest centralized model-ready cohort used for random FL split.",
+    "prediction_horizon": "One-year onset horizon",
+    "data_sources": [
+      "diagnosis events",
+      "inpatient encounters",
+      "outpatient encounters",
+      "prescriptions"
+    ],
+    "modelling_status": "Centralized modelling, calibration, temporal validation, random 4-client split, and first FL simulation completed.",
+    "best_centralized_model": "enhanced_clinical LightGBM + sigmoid calibration",
+    "federated_simulation_status": "First local random 4-client FedAvg PyTorch MLP proof-of-concept completed.",
+    "number_of_clients": 4,
+    "total_patients": 5840319,
+    "total_positives": 18827,
+    "total_negatives": 5821492,
+    "positive_rate": 0.003223625284851735
+  },
+  "GET /api/federated/rounds": {
+    "rows": [
+      {
+        "round": 1,
+        "global_weighted_loss": 0.5160733348488461,
+        "global_weighted_auroc": 0.8221423964064465,
+        "global_weighted_auprc": 0.01224742776977478,
+        "global_weighted_brier": 0.1871361339447541,
+        "global_weighted_precision_at_0_5": 0.008011668824376242,
+        "global_weighted_recall_at_0_5": 0.8496280552603613,
+        "global_weighted_specificity_at_0_5": 0.6597483466460534,
+        "global_weighted_f1_at_0_5": 0.015873557531096375,
+        "total_validation_rows": 1168064,
+        "total_validation_positives": 3764,
+        "participating_clients": 4
+      },
+      {
+        "round": 2,
+        "global_weighted_loss": 0.5119083281246174,
+        "global_weighted_auroc": 0.8238957867438331,
+        "global_weighted_auprc": 0.012572552122762325,
+        "global_weighted_brier": 0.18537841532782684,
+        "global_weighted_precision_at_0_5": 0.00804161065637806,
+        "global_weighted_recall_at_0_5": 0.8522848034006376,
+        "global_weighted_specificity_at_0_5": 0.6600584041913596,
+        "global_weighted_f1_at_0_5": 0.015932828620805948,
+        "total_validation_rows": 1168064,
+        "total_validation_positives": 3764,
+        "participating_clients": 4
+      }
+    ]
+  },
+  "GET /api/federated/clients": {
+    "rows": [
+      {
+        "client_id": "client_1",
+        "rows": 1460080,
+        "unique_patients": 1460080,
+        "positive_patients": 4707,
+        "negative_patients": 1455373,
+        "positive_rate": 0.0032237959563859516,
+        "data_path": "C:\\Users\\Admin\\Desktop\\disease-prediction\\data\\federated\\random_4_clients\\client_1\\data.parquet"
+      },
+      {
+        "client_id": "client_2",
+        "rows": 1460080,
+        "unique_patients": 1460080,
+        "positive_patients": 4707,
+        "negative_patients": 1455373,
+        "positive_rate": 0.0032237959563859516,
+        "data_path": "C:\\Users\\Admin\\Desktop\\disease-prediction\\data\\federated\\random_4_clients\\client_2\\data.parquet"
+      },
+      {
+        "client_id": "client_3",
+        "rows": 1460080,
+        "unique_patients": 1460080,
+        "positive_patients": 4707,
+        "negative_patients": 1455373,
+        "positive_rate": 0.0032237959563859516,
+        "data_path": "C:\\Users\\Admin\\Desktop\\disease-prediction\\data\\federated\\random_4_clients\\client_3\\data.parquet"
+      },
+      {
+        "client_id": "client_4",
+        "rows": 1460079,
+        "unique_patients": 1460079,
+        "positive_patients": 4706,
+        "negative_patients": 1455373,
+        "positive_rate": 0.0032231132698984097,
+        "data_path": "C:\\Users\\Admin\\Desktop\\disease-prediction\\data\\federated\\random_4_clients\\client_4\\data.parquet"
+      }
+    ]
+  },
+  "GET /api/limitations": {
+    "limitations": [
+      "Synthetic IID-style random client split; not institution-based.",
+      "Local simulator path rather than secure provisioned NVIDIA FLARE deployment.",
+      "PyTorch MLP differs from centralized LightGBM, so comparisons are directional.",
+      "Rare positive class creates low precision at threshold 0.5.",
+      "FL model probabilities are not calibrated in Step 23.",
+      "No external validation has been completed.",
+      "Administrative diagnosis and prescription data can contain coding noise.",
+      "FL reduces raw data movement but does not eliminate privacy risk.",
+      "Secure aggregation, differential privacy, and formal privacy threat modeling are future work.",
+      "The Step 23 model is proof-of-concept and not production-ready."
+    ],
+    "production_readiness": "not_production_ready",
+    "required_before_clinical_use": [
+      "clinical validation",
+      "external validation",
+      "calibration and threshold governance",
+      "privacy threat model",
+      "secure deployment design",
+      "role-based access control"
+    ]
+  },
+  "future POST /api/predict": {
+    "status": "future_secure_internal_only",
+    "requirements": [
+      "authentication",
+      "authorization",
+      "audit logging",
+      "deployment approval",
+      "no patient identifier exposure"
+    ]
+  }
+}

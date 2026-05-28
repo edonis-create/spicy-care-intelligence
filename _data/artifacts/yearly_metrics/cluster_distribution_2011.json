@@ -1,0 +1,29 @@
+{
+  "year": 2011,
+  "cluster_counts": [
+    461090,
+    2853524,
+    576387,
+    1492580
+  ],
+  "cluster_proportions": [
+    0.08564745287569742,
+    0.5300419924953298,
+    0.10706386696884472,
+    0.27724668766012805
+  ],
+  "min_cluster_share": 0.08564745287569742,
+  "max_cluster_share": 0.5300419924953298,
+  "warnings": {
+    "has_empty_cluster": false,
+    "min_share_below_threshold": false,
+    "extreme_imbalance": false,
+    "tiny_cluster_present": false,
+    "degenerate_centroid_distance": false,
+    "invalid_ch_denominator": false,
+    "invalid_dbi_denominator": false,
+    "zero_within_dispersion": false
+  },
+  "any_warning_ever": false,
+  "rounds_completed": 15
+}

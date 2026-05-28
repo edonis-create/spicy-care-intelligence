@@ -1,0 +1,211 @@
+{
+  "version": "1.0.0",
+  "base_path": "/api",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/project-summary",
+      "purpose": "Project and use case KPI summary",
+      "response_source_file": "project_summary.json",
+      "sample_json_response": {
+        "source_file": "project_summary.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/product-navigation",
+      "purpose": "End-user product navigation metadata",
+      "response_source_file": "product_navigation.json",
+      "sample_json_response": {
+        "source_file": "product_navigation.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/user-roles",
+      "purpose": "End-product role definitions",
+      "response_source_file": "user_roles.json",
+      "sample_json_response": {
+        "source_file": "user_roles.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/model-registry",
+      "purpose": "Product model registry and status",
+      "response_source_file": "model_registry.json",
+      "sample_json_response": {
+        "source_file": "model_registry.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/metrics/centralized-vs-federated",
+      "purpose": "Directional centralized and collaborative model metrics",
+      "response_source_file": "centralized_vs_federated_metrics.csv",
+      "sample_json_response": {
+        "source_file": "centralized_vs_federated_metrics.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/temporal-validation",
+      "purpose": "Rolling-window temporal validation metrics",
+      "response_source_file": "temporal_validation_metrics.csv",
+      "sample_json_response": {
+        "source_file": "temporal_validation_metrics.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/federated/rounds",
+      "purpose": "Collaborative training round metrics",
+      "response_source_file": "fl_training_rounds.csv",
+      "sample_json_response": {
+        "source_file": "fl_training_rounds.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/federated/sites",
+      "purpose": "Aggregate partner/site summaries",
+      "response_source_file": "fl_client_summary.csv",
+      "sample_json_response": {
+        "source_file": "fl_client_summary.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/threshold-analysis",
+      "purpose": "Threshold and intervention planning metrics",
+      "response_source_file": "threshold_analysis_summary.csv",
+      "sample_json_response": {
+        "source_file": "threshold_analysis_summary.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration",
+      "purpose": "Calibration comparison metrics",
+      "response_source_file": "calibration_summary.csv",
+      "sample_json_response": {
+        "source_file": "calibration_summary.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/feature-importance",
+      "purpose": "Aggregate feature importance for cohort insight",
+      "response_source_file": "feature_importance_summary.csv",
+      "sample_json_response": {
+        "source_file": "feature_importance_summary.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/pages",
+      "purpose": "Page-level dashboard layout, chart, metric, and report specifications",
+      "response_source_file": "dashboard_page_specs.json",
+      "sample_json_response": {
+        "source_file": "dashboard_page_specs.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/metrics",
+      "purpose": "Metric catalog for all dashboard cards and metric displays",
+      "response_source_file": "dashboard_metric_catalog.csv",
+      "sample_json_response": {
+        "source_file": "dashboard_metric_catalog.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/charts",
+      "purpose": "Chart catalog for all dashboard visualizations",
+      "response_source_file": "dashboard_chart_catalog.csv",
+      "sample_json_response": {
+        "source_file": "dashboard_chart_catalog.csv",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/validation-engine",
+      "purpose": "Partner/site data validation summary",
+      "response_source_file": "validation_engine_summary.json",
+      "sample_json_response": {
+        "source_file": "validation_engine_summary.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/limitations",
+      "purpose": "Known limitations and governance caveats",
+      "response_source_file": "limitations.json",
+      "sample_json_response": {
+        "source_file": "limitations.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard-manifest",
+      "purpose": "Generated dashboard data inventory",
+      "response_source_file": "dashboard_manifest.json",
+      "sample_json_response": {
+        "source_file": "dashboard_manifest.json",
+        "status": "available",
+        "privacy_classification": "aggregate"
+      },
+      "privacy_notes": "Aggregate dashboard data only. No patient-level prediction endpoint in version 1."
+    }
+  ],
+  "future_endpoint_note": "A future POST /api/predict endpoint would require secure internal deployment, authentication, authorization, audit logging, strict minimum-necessary data handling, and no raw identifier exposure."
+}
