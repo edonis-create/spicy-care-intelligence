@@ -1184,5 +1184,7 @@ if _DIST.exists():
 
     @app.get("/{full_path:path}", include_in_schema=False)
     def spa_fallback(full_path: str):
-        """Return index.html for every non-API route so React Router works."""
+        from fastapi import HTTPException
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API endpoint not found")
         return FileResponse(_DIST / "index.html")
