@@ -386,10 +386,30 @@ def _load_profiles_from_file(year: int, phenotypes: list[Phenotype]) -> list[Pro
     profile_rows = payload.get("cluster_profiles")
     if not isinstance(profile_rows, list):
         return None
+
+    # Build raw_cluster_id → phenotype_code mapping from the dictionary
+    dict_path = ARTIFACTS_ROOT / "dictionaries" / "phenotype_dictionary.json"
+    code_for_cluster: dict[int, str] = {}
+    if dict_path.exists():
+        dict_payload = _load_json(dict_path)
+        if isinstance(dict_payload, dict):
+            for row in dict_payload.get("rows", []):
+                if isinstance(row, dict) and int(row.get("year", 0) or 0) == year:
+                    code = str(row.get("phenotype_code", "")).strip()
+                    cid = row.get("raw_cluster_id")
+                    if code and cid is not None:
+                        code_for_cluster[int(cid)] = code
+
+    phenotype_by_id = {p.id: p for p in phenotypes}
+
     profiles: list[ProfileEntry] = []
     for index, row in enumerate(profile_rows):
-        phenotype = phenotypes[index] if index < len(phenotypes) else Phenotype(**PHENOTYPES[index % len(PHENOTYPES)])
         if not isinstance(row, dict):
+            continue
+        raw_cid = int(row.get("cluster_id", index))
+        code = code_for_cluster.get(raw_cid)
+        phenotype = phenotype_by_id.get(code) if code else (phenotypes[index] if index < len(phenotypes) else None)
+        if phenotype is None:
             continue
         means = row.get("feature_means", {})
         profiles.append(
@@ -398,7 +418,7 @@ def _load_profiles_from_file(year: int, phenotypes: list[Phenotype]) -> list[Pro
                 avg_conditions=round(float(means.get("dx_unique_count_log", 0.0)), 3),
                 avg_prescriptions=round(float(means.get("prescription_count_log", 0.0)), 3),
                 avg_encounters=round(float(means.get("outpatient_visits_log", 0.0)), 3),
-                source_cluster_id=int(row.get("cluster_id", index)),
+                source_cluster_id=raw_cid,
                 source_features={str(k): float(v) for k, v in means.items() if isinstance(v, (int, float))},
             )
         )
