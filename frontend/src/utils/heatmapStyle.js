@@ -1,40 +1,64 @@
 /**
- * Shared heatmap visuals — aligns with theme accent (--accent #ff2a2a) and a
- * slightly non-linear ramp so mid/high values read more distinctly.
+ * Multi-stop cool-to-warm heatmap scale.
+ * Low distance (similar phenotypes) → blue/teal
+ * High distance (distinct phenotypes) → amber/red
  */
 
-const ACCENT = { r: 255, g: 42, b: 42 };
-/** Slightly deeper red at gradient end (still on-brand). */
-const ACCENT_DEEP = { r: 232, g: 28, b: 36 };
+// 5 perceptually distinct stops from cool to warm
+const STOPS = [
+  { t: 0.00, r:  30, g:  58, b: 138 }, // deep blue
+  { t: 0.28, r:   8, g: 145, b: 178 }, // cyan
+  { t: 0.52, r:  16, g: 185, b: 129 }, // emerald
+  { t: 0.74, r: 245, g: 158, b:  11 }, // amber
+  { t: 1.00, r: 220, g:  38, b:  38 }, // vivid red
+];
 
-/** Horizontal scale bar under heatmaps (matches cell ramp). */
-export const HEATMAP_LEGEND_GRADIENT =
-  "linear-gradient(90deg, rgba(255,42,42,0.07), rgba(255,42,42,0.38) 42%, rgba(255,42,42,0.92) 88%, rgba(232,28,36,1) 100%)";
+function interpolateStops(t) {
+  const clamped = Math.max(0, Math.min(1, t));
+  let lo = STOPS[0];
+  let hi = STOPS[STOPS.length - 1];
+  for (let i = 0; i < STOPS.length - 1; i++) {
+    if (clamped >= STOPS[i].t && clamped <= STOPS[i + 1].t) {
+      lo = STOPS[i];
+      hi = STOPS[i + 1];
+      break;
+    }
+  }
+  const span = hi.t - lo.t || 1;
+  const f = (clamped - lo.t) / span;
+  return {
+    r: Math.round(lo.r + (hi.r - lo.r) * f),
+    g: Math.round(lo.g + (hi.g - lo.g) * f),
+    b: Math.round(lo.b + (hi.b - lo.b) * f),
+  };
+}
 
-/**
- * @param {number} value
- * @param {number} maxValue
- * @returns {{ background: string, color: string }}
- */
+export const HEATMAP_LEGEND_GRADIENT = (() => {
+  const pts = [0, 0.28, 0.52, 0.74, 1].map((t) => {
+    const { r, g, b } = interpolateStops(t);
+    return `rgb(${r},${g},${b}) ${(t * 100).toFixed(0)}%`;
+  });
+  return `linear-gradient(90deg, ${pts.join(", ")})`;
+})();
+
 export function getHeatmapCellStyle(value, maxValue) {
   const max = Math.max(Number(maxValue) || 0, 1e-9);
   const raw = Math.max(0, Math.min(1, Number(value || 0) / max));
 
   if (raw < 1e-6) {
     return {
-      background:
-        "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)",
+      background: "rgba(255,255,255,0.03)",
       color: "var(--text-quaternary)",
     };
   }
 
-  // Spread low/mid values, saturate highs toward accent (easier to scan).
-  const t = Math.pow(raw, 0.72);
-  const aTop = 0.08 + t * 0.64;
-  const aBot = 0.05 + t * 0.78;
+  // Slight power curve so mid-range values spread more visibly
+  const t = Math.pow(raw, 0.78);
+  const { r, g, b } = interpolateStops(t);
+  const alpha = 0.18 + t * 0.72;
 
   return {
-    background: `linear-gradient(165deg, rgba(${ACCENT.r},${ACCENT.g},${ACCENT.b},${aTop.toFixed(3)}) 0%, rgba(${ACCENT_DEEP.r},${ACCENT_DEEP.g},${ACCENT_DEEP.b},${aBot.toFixed(3)}) 100%)`,
-    color: t > 0.4 ? "#ffffff" : t > 0.16 ? "var(--text-primary)" : "var(--text-secondary)",
+    background: `rgba(${r},${g},${b},${alpha.toFixed(3)})`,
+    color: t > 0.35 ? "#ffffff" : "var(--text-primary)",
   };
 }
