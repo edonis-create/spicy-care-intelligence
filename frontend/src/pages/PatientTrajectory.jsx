@@ -5,7 +5,6 @@ import { Spinner } from "../components/Spinner";
 import { StatusBanner } from "../components/StatusBanner";
 import { PHENOTYPE_BY_ID, PHENOTYPES, getStandardPhenotypeLabel } from "../constants/phenotypes";
 
-const PATIENT_LEVEL_ACCESS_ENABLED = String(import.meta.env.VITE_ENABLE_PATIENT_LEVEL_ACCESS || "").toLowerCase() === "true";
 const PHENOTYPE_ORDER = ["P1", "P2", "P3", "P4", "P5"];
 
 const TIER_COLORS = {
@@ -42,7 +41,6 @@ export function PatientTrajectory() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!PATIENT_LEVEL_ACCESS_ENABLED) return;
     setPatientListLoading(true);
     getPatients()
       .then((data) => {
@@ -63,7 +61,7 @@ export function PatientTrajectory() {
   );
 
   const loadTrajectory = async (pid = selectedId) => {
-    if (!PATIENT_LEVEL_ACCESS_ENABLED || !pid) return;
+    if (!pid) return;
     setIsLoading(true);
     setError("");
     setPayload(null);
@@ -111,68 +109,59 @@ export function PatientTrajectory() {
         description="Follow an individual patient's risk tier trajectory year by year. Requires patient-level data access."
       />
 
-      {!PATIENT_LEVEL_ACCESS_ENABLED && (
-        <StatusBanner
-          tone="warning"
-          message="Patient-level access is disabled. Enable VITE_ENABLE_PATIENT_LEVEL_ACCESS=true to use this page."
-        />
-      )}
+      <section className="rounded-3xl border border-border-default bg-surface-1 p-6 shadow-sm">
+        <h2 className="mb-4 text-base font-semibold text-fg-primary">Select Patient</h2>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <label className="text-sm font-medium text-fg-secondary">
+            Filter by risk tier
+            <select
+              className="mt-2 w-full rounded-xl border border-border-default px-3 py-2 text-sm"
+              value={tierFilter}
+              onChange={(e) => {
+                setTierFilter(e.target.value);
+                setPayload(null);
+              }}
+            >
+              <option value="all">All tiers</option>
+              {PHENOTYPES.map((p) => (
+                <option key={p.id} value={p.id}>{p.id} · {p.label}</option>
+              ))}
+            </select>
+          </label>
 
-      {PATIENT_LEVEL_ACCESS_ENABLED && (
-        <section className="rounded-3xl border border-border-default bg-surface-1 p-6 shadow-sm">
-          <h2 className="mb-4 text-base font-semibold text-fg-primary">Select Patient</h2>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <label className="text-sm font-medium text-fg-secondary">
-              Filter by risk tier
+          <label className="flex-1 text-sm font-medium text-fg-secondary">
+            Patient
+            {patientListLoading ? (
+              <div className="mt-2 flex items-center gap-2 text-sm text-fg-tertiary"><Spinner />Loading patients...</div>
+            ) : (
               <select
                 className="mt-2 w-full rounded-xl border border-border-default px-3 py-2 text-sm"
-                value={tierFilter}
-                onChange={(e) => {
-                  setTierFilter(e.target.value);
-                  setPayload(null);
-                }}
+                value={selectedId}
+                onChange={(e) => { setSelectedId(e.target.value); setPayload(null); }}
               >
-                <option value="all">All tiers</option>
-                {PHENOTYPES.map((p) => (
-                  <option key={p.id} value={p.id}>{p.id} · {p.label}</option>
+                {filteredPatients.length === 0 && <option value="">No patients available</option>}
+                {filteredPatients.map((p) => (
+                  <option key={p.patient_id} value={p.patient_id}>
+                    {p.patient_id} · {p.dominant_tier} · {p.years_observed} yrs
+                  </option>
                 ))}
               </select>
-            </label>
+            )}
+          </label>
 
-            <label className="flex-1 text-sm font-medium text-fg-secondary">
-              Patient
-              {patientListLoading ? (
-                <div className="mt-2 flex items-center gap-2 text-sm text-fg-tertiary"><Spinner />Loading patients...</div>
-              ) : (
-                <select
-                  className="mt-2 w-full rounded-xl border border-border-default px-3 py-2 text-sm"
-                  value={selectedId}
-                  onChange={(e) => { setSelectedId(e.target.value); setPayload(null); }}
-                >
-                  {filteredPatients.length === 0 && <option value="">No patients available</option>}
-                  {filteredPatients.map((p) => (
-                    <option key={p.patient_id} value={p.patient_id}>
-                      {p.patient_id} · {p.dominant_tier} · {p.years_observed} yrs
-                    </option>
-                  ))}
-                </select>
-              )}
-            </label>
-
-            <button
-              type="button"
-              onClick={() => loadTrajectory(selectedId)}
-              disabled={!selectedId || isLoading}
-              className="rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Load
-            </button>
-          </div>
-          <p className="mt-3 text-xs text-fg-tertiary">
-            {patientList.length} patients available across all risk tiers · IDs are hashed (no PII)
-          </p>
-        </section>
-      )}
+          <button
+            type="button"
+            onClick={() => loadTrajectory(selectedId)}
+            disabled={!selectedId || isLoading}
+            className="rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Load
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-fg-tertiary">
+          {patientList.length} patients available across all risk tiers · IDs are hashed (no PII)
+        </p>
+      </section>
 
       {isLoading && (
         <div className="flex items-center gap-2 rounded-2xl border border-border-default bg-surface-1 p-4 text-sm text-fg-secondary">
