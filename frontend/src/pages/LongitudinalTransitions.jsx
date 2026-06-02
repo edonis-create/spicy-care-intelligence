@@ -281,7 +281,7 @@ export function LongitudinalTransitions() {
         <div className="flex items-start gap-3 rounded-lg border border-amber-500/25 bg-amber-500/10 p-4">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
           <p className="text-[12.5px] text-amber-300">
-            <strong>{(p4ToP5 * 100).toFixed(1)}%</strong> of Chronic Stable (Tier 4) patients escalated to High Complexity (Tier 5) between {fromYear} and {toYear}.
+            <strong>{(p4ToP5 * 100).toFixed(1)}%</strong> of Cardiovascular Polypharmacy (Tier 4) patients escalated to Highest Acuity (Tier 5) between {fromYear} and {toYear}.
             This is the primary at-risk transition — targeted interventions on Tier 4 patients can reduce this rate.
           </p>
         </div>

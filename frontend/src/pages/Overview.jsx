@@ -221,13 +221,13 @@ export function Overview() {
     const msgs = [];
     if (p5Delta != null && p5Delta > 0.5) {
       msgs.push(
-        `High Complexity (Tier 5) population grew ${p5Delta.toFixed(1)} percentage points vs ${selectedYear - 1} — now ${p5Current.toFixed(1)}% of cohort (${formatNumber(p5Count)} patients).`,
+        `Highest Acuity (Tier 5) population grew ${p5Delta.toFixed(1)} percentage points vs ${selectedYear - 1} — now ${p5Current.toFixed(1)}% of cohort (${formatNumber(p5Count)} patients).`,
       );
     }
     if (p4Count > 0) {
       const estimatedAtRisk = Math.round(p4Count * 0.35);
       msgs.push(
-        `~${formatNumber(estimatedAtRisk)} Chronic Stable (Tier 4) patients are at risk of escalation to High Complexity based on historical transition rates.`,
+        `~${formatNumber(estimatedAtRisk)} Cardiovascular Polypharmacy (Tier 4) patients are at risk of escalation to Highest Acuity based on historical transition rates.`,
       );
     }
     return msgs;
@@ -337,7 +337,7 @@ export function Overview() {
           }}
         >
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-400">High Complexity</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-400">Highest Acuity</p>
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
               <TrendingUp className="h-4 w-4 text-red-400" />
             </span>

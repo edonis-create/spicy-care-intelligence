@@ -70,7 +70,7 @@ function P5TrendTooltip({ active, payload, label }) {
       render={(items) =>
         items.map((entry) => (
           <div key={entry.name} style={{ fontSize: "12.5px", color: "var(--text-secondary)" }}>
-            High Complexity:{" "}
+            Highest Acuity:{" "}
             <span style={{ color: entry.color, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
               {formatPct(entry.value)}
             </span>{" "}
@@ -237,8 +237,8 @@ export function PopulationForecast() {
         <>
           {/* ── Key projections ─────────────────────────────────────────── */}
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Delta label="High Complexity (Tier 5)" current={baseP5} projected={projP5} />
-            <Delta label="Low Risk (Tier 1)" current={baseP1} projected={projP1} />
+            <Delta label="Highest Acuity (Tier 5)" current={baseP5} projected={projP5} />
+            <Delta label="Minimal Burden (Tier 1)" current={baseP1} projected={projP1} />
             {(forecast.projected || []).slice(-1).map((proj) =>
               ["P3", "P4"].map((id) => (
                 <Delta
@@ -256,9 +256,9 @@ export function PopulationForecast() {
             <div className="flex items-start gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-4">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
               <div>
-                <p className="text-[13px] font-semibold text-red-300">High Complexity population growth projected</p>
+                <p className="text-[13px] font-semibold text-red-300">Highest Acuity population growth projected</p>
                 <p className="mt-0.5 text-[12.5px] text-red-400">
-                  Tier 5 (High Complexity) patients are projected to grow from{" "}
+                  Tier 5 (Highest Acuity) patients are projected to grow from{" "}
                   <strong>{formatPct(baseP5)}</strong> to <strong>{formatPct(projP5)}</strong> over {horizon}{" "}
                   year{horizon > 1 ? "s" : ""} — a{" "}
                   <strong>+{(projP5 - baseP5).toFixed(1)} percentage point</strong> increase.
@@ -316,8 +316,8 @@ export function PopulationForecast() {
 
           {/* ── P5 focused trend ─────────────────────────────────────────── */}
           <SectionCard
-            eyebrow="High complexity focus"
-            title="Tier 5 — High Complexity trajectory"
+            eyebrow="Highest acuity focus"
+            title="Tier 5 — Highest Acuity trajectory"
             description="Track the most resource-intensive patient group over time."
             action={
               <Chip tone="ghost" size="md" leadingIcon={TrendingUp}>

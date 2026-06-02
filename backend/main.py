@@ -28,11 +28,11 @@ else:
 ARTIFACTS_ROOT = Path(os.getenv("ARTIFACTS_ROOT", _DEFAULT_ARTIFACTS))
 
 PHENOTYPES = [
-    {"id": "P1", "name": "Low burden", "label": "P1 Low burden", "color": "blue", "description": "Lower morbidity and medication utilization."},
-    {"id": "P2", "name": "Moderate burden", "label": "P2 Moderate burden", "color": "teal", "description": "Moderate condition burden with stable utilization."},
-    {"id": "P3", "name": "Medication-heavy chronic", "label": "P3 Medication-heavy chronic", "color": "amber", "description": "Chronic profile dominated by prescription intensity."},
-    {"id": "P4", "name": "Lower-Rx chronic", "label": "P4 Lower-Rx chronic", "color": "orange", "description": "Chronic disease profile with lower prescription use."},
-    {"id": "P5", "name": "High complexity", "label": "P5 High complexity", "color": "red", "description": "Highest clinical complexity and utilization burden."},
+    {"id": "P1", "name": "Minimal Burden", "label": "P1 Minimal Burden", "color": "blue", "description": "Youngest cohort with minimal disease load, near-zero medication use, and rare healthcare encounters."},
+    {"id": "P2", "name": "Stable Polypharmacy", "label": "P2 Stable Polypharmacy", "color": "teal", "description": "Older patients with high chronic medication exposure (~91% on long-term therapy), primarily outpatient-managed with low inpatient activity."},
+    {"id": "P3", "name": "Active Multimorbid", "label": "P3 Active Multimorbid", "color": "amber", "description": "Near-average age with high diagnosis diversity and frequent outpatient visits. Moderate medication use driven by multiple concurrent conditions."},
+    {"id": "P4", "name": "Cardiovascular Polypharmacy", "label": "P4 Cardiovascular Polypharmacy", "color": "orange", "description": "Oldest subgroup with dominant circulatory disease burden, highest polypharmacy (~81%), and significant inpatient activity."},
+    {"id": "P5", "name": "Highest Acuity", "label": "P5 Highest Acuity", "color": "red", "description": "Highest diagnosis breadth, inpatient admission rate, and outpatient utilization across all tiers. Priority for intensive care coordination."},
 ]
 BASE_DISTRIBUTION = {"P1": 0.28, "P2": 0.24, "P3": 0.19, "P4": 0.17, "P5": 0.12}
 
