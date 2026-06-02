@@ -338,10 +338,33 @@ def _load_summary_from_file(year: int, phenotypes: list[Phenotype]) -> tuple[lis
     counts = distribution.get("counts", [])
     shares = distribution.get("proportions", [])
     total_patients = payload.get("metadata", {}).get("total_patients", _yearly_patient_count(year))
+
+    # Build a cluster_id → count/share lookup using the phenotype dictionary rows
+    # so that P5 in a k=4 year correctly uses raw_cluster_id=3, not positional index 4.
+    dict_dir = ARTIFACTS_ROOT / "dictionaries"
+    dict_path = dict_dir / "phenotype_dictionary.json"
+    cluster_for_code: dict[str, int] = {}
+    if dict_path.exists():
+        dict_payload = _load_json(dict_path)
+        if isinstance(dict_payload, dict):
+            for row in dict_payload.get("rows", []):
+                if isinstance(row, dict) and int(row.get("year", 0) or 0) == year:
+                    code = str(row.get("phenotype_code", "")).strip()
+                    cid = row.get("raw_cluster_id")
+                    if code and cid is not None:
+                        cluster_for_code[code] = int(cid)
+
     phenotype_counts: list[PhenotypeCount] = []
-    for index, phenotype in enumerate(phenotypes):
-        count = int(counts[index]) if index < len(counts) else 0
-        share = float(shares[index]) if index < len(shares) else (count / total_patients if total_patients else 0.0)
+    for phenotype in phenotypes:
+        if cluster_for_code and phenotype.id in cluster_for_code:
+            cid = cluster_for_code[phenotype.id]
+            count = int(counts[cid]) if cid < len(counts) else 0
+            share = float(shares[cid]) if cid < len(shares) else (count / total_patients if total_patients else 0.0)
+        else:
+            # fallback: positional (used when dictionary rows are unavailable)
+            index = list(p.id for p in phenotypes).index(phenotype.id)
+            count = int(counts[index]) if index < len(counts) else 0
+            share = float(shares[index]) if index < len(shares) else (count / total_patients if total_patients else 0.0)
         phenotype_counts.append(PhenotypeCount(**phenotype.model_dump(), patient_count=count, share=round(share, 6)))
     return phenotype_counts, int(total_patients), _extract_summary_metrics(payload)
 
