@@ -518,6 +518,7 @@ export function LongitudinalTransitions() {
             edges={rawSankeyEdges}
             focusId={sankeyFocusId}
             formatValue={(fromId, value) => formatMatrixValue(fromId, value)}
+            onFocusChange={setSankeyFocusId}
           />
         </div>
       </SectionCard>
@@ -622,7 +623,7 @@ export function LongitudinalTransitions() {
  * the data for that year we add a near-zero "ghost" link so the node stays
  * visible (as a thin dashed sliver) without distorting real proportions.
  */
-function SankeyChart({ edges, focusId, formatValue }) {
+function SankeyChart({ edges, focusId, formatValue, onFocusChange }) {
   const WIDTH = 1000;
   const HEIGHT = 480;
   const NODE_WIDTH = 16;
@@ -631,6 +632,7 @@ function SankeyChart({ edges, focusId, formatValue }) {
   const PAD_X = 78;
   const PAD_Y = 28;
   const GHOST_VALUE = 0.012;
+  const [hoverRawId, setHoverRawId] = useState(null);
 
   const layout = useMemo(() => {
     if (!edges.length) return null;
@@ -734,9 +736,19 @@ function SankeyChart({ edges, focusId, formatValue }) {
   const { nodes, links } = layout;
   const linkPath = sankeyLinkHorizontal();
 
-  const nodeIsFocused = (node) => focusId === "ALL" || node.rawId === focusId;
+  // Click locks focus; hover previews it when nothing is locked
+  const effectiveFocusId = focusId !== "ALL" ? focusId : (hoverRawId ?? "ALL");
+  const hasActiveFocus = effectiveFocusId !== "ALL";
+
+  const nodeIsFocused = (node) => !hasActiveFocus || node.rawId === effectiveFocusId;
   const linkIsFocused = (link) =>
-    focusId === "ALL" || link.source.rawId === focusId || link.target.rawId === focusId;
+    !hasActiveFocus ||
+    link.source.rawId === effectiveFocusId ||
+    link.target.rawId === effectiveFocusId;
+
+  const handleNodeClick = (rawId) => {
+    onFocusChange?.(focusId === rawId ? "ALL" : rawId);
+  };
 
   return (
     <svg
@@ -757,13 +769,14 @@ function SankeyChart({ edges, focusId, formatValue }) {
               x1={link.source.x1}
               x2={link.target.x0}
             >
-              <stop offset="0%" stopColor={fromHex} stopOpacity={0.85} />
-              <stop offset="100%" stopColor={toHex} stopOpacity={0.85} />
+              <stop offset="0%" stopColor={fromHex} stopOpacity={0.9} />
+              <stop offset="100%" stopColor={toHex} stopOpacity={0.9} />
             </linearGradient>
           );
         })}
       </defs>
 
+      {/* Links */}
       <g>
         {links
           .slice()
@@ -779,9 +792,9 @@ function SankeyChart({ edges, focusId, formatValue }) {
                   fill="none"
                   stroke="rgba(255,255,255,0.18)"
                   strokeWidth={1}
-                  strokeOpacity={focused ? 0.45 : 0.18}
+                  strokeOpacity={focused ? 0.38 : 0.08}
                   strokeDasharray="3 3"
-                  style={{ pointerEvents: "none" }}
+                  style={{ pointerEvents: "none", transition: "stroke-opacity 180ms ease" }}
                 />
               );
             }
@@ -792,8 +805,8 @@ function SankeyChart({ edges, focusId, formatValue }) {
                 fill="none"
                 stroke={`url(#sk-grad-${idx})`}
                 strokeWidth={Math.max(1, link.width)}
-                strokeOpacity={focused ? 0.78 : 0.18}
-                style={{ transition: "stroke-opacity 160ms ease-out" }}
+                strokeOpacity={focused ? 0.82 : 0.07}
+                style={{ transition: "stroke-opacity 180ms ease" }}
               >
                 <title>
                   {getStandardPhenotypeLabel(link.source.rawId)} → {getStandardPhenotypeLabel(link.target.rawId)}:{" "}
@@ -804,10 +817,50 @@ function SankeyChart({ edges, focusId, formatValue }) {
           })}
       </g>
 
+      {/* Percentage labels on focused links */}
+      {hasActiveFocus && (
+        <g style={{ pointerEvents: "none" }}>
+          {links
+            .filter((link) => !link.isGhost && linkIsFocused(link) && link.width >= 6)
+            .map((link, i) => {
+              const midX = (link.source.x1 + link.target.x0) / 2;
+              const midY = (link.y0 + link.y1) / 2;
+              const label = formatValue(link.source.rawId, link.probability);
+              const bgW = label.length * 6.4 + 10;
+              const bgH = 16;
+              return (
+                <g key={`sk-linklabel-${i}`}>
+                  <rect
+                    x={midX - bgW / 2}
+                    y={midY - bgH / 2}
+                    width={bgW}
+                    height={bgH}
+                    rx={4}
+                    fill="rgba(10,10,11,0.78)"
+                  />
+                  <text
+                    x={midX}
+                    y={midY + 4.5}
+                    textAnchor="middle"
+                    fontSize="10.5"
+                    fontWeight="700"
+                    fill="rgba(255,255,255,0.92)"
+                    letterSpacing="0.02em"
+                  >
+                    {label}
+                  </text>
+                </g>
+              );
+            })}
+        </g>
+      )}
+
+      {/* Nodes */}
       <g>
         {nodes.map((node) => {
           const meta = getPhenotypeChipMeta(node.rawId);
           const focused = nodeIsFocused(node);
+          const isActive = focusId === node.rawId;
           const h = Math.max(2, node.y1 - node.y0);
           const labelOnLeft = node.side === "src";
           const labelX = labelOnLeft ? node.x0 - 8 : node.x1 + 8;
@@ -819,7 +872,14 @@ function SankeyChart({ edges, focusId, formatValue }) {
           return (
             <g
               key={`sk-node-${node.name}`}
-              opacity={focused ? (isGhost ? 0.55 : 1) : isGhost ? 0.22 : 0.32}
+              opacity={focused ? (isGhost ? 0.55 : 1) : isGhost ? 0.15 : 0.18}
+              style={{
+                cursor: isGhost ? "default" : "pointer",
+                transition: "opacity 180ms ease",
+              }}
+              onClick={() => !isGhost && handleNodeClick(node.rawId)}
+              onMouseEnter={() => !isGhost && setHoverRawId(node.rawId)}
+              onMouseLeave={() => setHoverRawId(null)}
             >
               <rect
                 x={node.x0}
@@ -827,8 +887,8 @@ function SankeyChart({ edges, focusId, formatValue }) {
                 width={node.x1 - node.x0}
                 height={h}
                 fill={isGhost ? "transparent" : meta.hex}
-                stroke={isGhost ? meta.hex : "transparent"}
-                strokeWidth={isGhost ? 1 : 0}
+                stroke={isActive ? "#fff" : isGhost ? meta.hex : "transparent"}
+                strokeWidth={isActive ? 1.5 : isGhost ? 1 : 0}
                 strokeDasharray={isGhost ? "2 2" : undefined}
                 rx={2}
               >
