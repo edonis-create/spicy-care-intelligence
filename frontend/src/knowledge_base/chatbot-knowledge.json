@@ -1,0 +1,1592 @@
+{
+  "app": {
+    "name": "heliX Population Health",
+    "subtitle": "Clinical decision support platform",
+    "description": "A federated healthcare analytics dashboard for patient stratification. Uses horizontal federated learning (K-means clustering) across 5 hospital sites to classify patients into clinical risk tiers (phenotypes P1–P5). Includes a LightGBM diabetes prediction model.",
+    "purpose": "Help clinicians understand patient population risk distribution, track longitudinal transitions between risk tiers, forecast future population composition, and identify patients needing care coordination.",
+    "data_sources": ["FEKVO (inpatient)", "JARO (outpatient)", "VENY (prescriptions)"],
+    "year_range": "2010–2017",
+    "federated_sites": 5,
+    "technology": "FastAPI backend + React/Vite frontend"
+  },
+
+  "navigation": {
+    "groups": [
+      {
+        "section": "Clinical",
+        "items": [
+          { "label": "Hospital Dashboard",  "path": "/overview",                "description": "Population health command center — patient risk distribution, trends, and care priorities." },
+          { "label": "Population Health",   "path": "/yearly-stratification",   "description": "Patient counts and risk tier profiles for the selected year." },
+          { "label": "Risk Tier Profiles",  "path": "/phenotype-explorer",      "description": "Inspect phenotype definitions, feature profiles, and side-by-side burden comparison." },
+          { "label": "Risk Progression",    "path": "/risk-progression",        "description": "How patients move between risk tiers year over year." },
+          { "label": "Population Forecast", "path": "/forecast",                "description": "Markov chain projections of future population composition." }
+        ]
+      },
+      {
+        "section": "Patient",
+        "items": [
+          { "label": "Patient Groups",  "path": "/cohort-analysis",     "description": "Track how patient cohorts evolve across risk tiers over time." },
+          { "label": "Patient Journey", "path": "/patient-trajectory",  "description": "Follow an individual patient's risk tier trajectory year by year. Requires patient-level data access." }
+        ]
+      },
+      {
+        "section": "Administration",
+        "items": [
+          { "label": "Data Quality", "path": "/data-quality", "description": "Verify that expected pipeline outputs are present and complete." },
+          { "label": "Settings",     "path": "/settings",     "description": "Workspace defaults, data sources, and display preferences." }
+        ]
+      }
+    ]
+  },
+
+  "phenotype_definitions": [
+    {
+      "id": "P1", "name": "Low Risk", "full_label": "Low burden / low utilization",
+      "clinical_tier": 1, "rag_status": "green", "color_hex": "#2563EB",
+      "description": "Lower morbidity and medication use. Stable, low-cost population.",
+      "clinical_profile": "Youngest patients (below-average age). Very low chronic Rx exposure (~1.5–6.4%), minimal prescriptions, fewest inpatient admissions (~4–6% have any), lowest outpatient visits. Minimal polypharmacy (<0.2%). Largest phenotype group most years (43–53% of population)."
+    },
+    {
+      "id": "P2", "name": "Moderate Risk", "full_label": "Moderate burden / mixed outpatient",
+      "clinical_tier": 2, "rag_status": "green", "color_hex": "#EC2027",
+      "description": "Moderate condition burden with stable healthcare utilization.",
+      "clinical_profile": "Above-average age. High chronic Rx exposure (93–97%), moderate prescriptions, low inpatient activity (10–20%), moderate outpatient use. Moderate polypharmacy (35–48%). Second-largest group most years (16–28%)."
+    },
+    {
+      "id": "P3", "name": "High Medication Need", "full_label": "Medication-heavy chronic multimorbidity",
+      "clinical_tier": 3, "rag_status": "amber", "color_hex": "#16A34A",
+      "description": "Chronic profile with high prescription intensity. Requires active medication management.",
+      "clinical_profile": "Slightly younger than average. Moderate chronic Rx (53–58%), high outpatient visits, moderate inpatient (~32–33%), higher diagnosis burden. Only present in 5-cluster years (2012–2015, 2017); merged into P3P4_merged in 4-cluster years (2010, 2011, 2016)."
+    },
+    {
+      "id": "P4", "name": "Chronic, Stable", "full_label": "Lower-Rx chronic multimorbidity with some inpatient activity",
+      "clinical_tier": 4, "rag_status": "amber", "color_hex": "#D97706",
+      "description": "Chronic disease profile. Manageable care needs, watch for escalation.",
+      "clinical_profile": "Oldest average age group. Very high chronic Rx (~96%), highest cardiovascular diagnosis burden (dx_chapter_I_uniq ~4.5–5.6), high inpatient rates (59–63%), high polypharmacy (66–86%), high prescriptions. Only present in 5-cluster years (2012–2015, 2017)."
+    },
+    {
+      "id": "P5", "name": "High Complexity", "full_label": "High complexity / high utilization",
+      "clinical_tier": 5, "rag_status": "red", "color_hex": "#7C3AED",
+      "description": "Highest clinical complexity and utilization. Priority intervention group — requires coordinated care.",
+      "clinical_profile": "High age, highest inpatient admission rate (62–73%), highest diagnosis count (dx_unique_count_log ~2.9–2.9), very high outpatient visits and prescriptions, highest polypharmacy (78–84%). Smallest group (4.8–8.6%) but highest cost per patient. Present every year."
+    },
+    {
+      "id": "P3P4_merged", "name": "Chronic (Merged)", "full_label": "Merged chronic multimorbidity state",
+      "clinical_tier": "3-4", "rag_status": "amber", "color_hex": "#B45309",
+      "description": "Combined P3+P4 group used in 4-cluster years (2010, 2011, 2016). Represents both chronic subgroups combined.",
+      "clinical_profile": "Moderate-to-high age, high outpatient visits, moderate-to-high inpatient (~52–53%), moderate diagnosis burden. Chronic Rx 63–75%. Polypharmacy 33–55%."
+    }
+  ],
+
+  "clustering_notes": {
+    "k_by_year": { "2010": 4, "2011": 4, "2012": 5, "2013": 5, "2014": 5, "2015": 5, "2016": 4, "2017": 5 },
+    "implication": "Years with k=4 (2010, 2011, 2016) combine P3 and P4 into one P3P4_merged group. Transition matrices for those years use P3P4_merged.",
+    "fl_quality": {
+      "2010": { "silhouette": 0.472, "davies_bouldin": 1.273, "calinski_harabasz": 2430852 },
+      "2012": { "silhouette": 0.474, "davies_bouldin": 1.179, "calinski_harabasz": 2365397 },
+      "2017": { "silhouette": 0.402, "davies_bouldin": 1.341, "calinski_harabasz": 562711 }
+    }
+  },
+
+  "yearly_population": {
+    "description": "Actual patient counts and shares per phenotype per year from federated K-means clustering.",
+    "2010": {
+      "total_patients": 5298520, "k": 4, "phenotypes": ["P1","P2","P3P4_merged","P5"],
+      "P1": { "count": 2817482, "pct": 53.17 },
+      "P2": { "count": 1468421, "pct": 27.71 },
+      "P3P4_merged": { "count": 567009, "pct": 10.70 },
+      "P5": { "count": 445608, "pct": 8.41 }
+    },
+    "2011": {
+      "total_patients": 5383581, "k": 4, "phenotypes": ["P1","P2","P3P4_merged","P5"],
+      "P1": { "count": 2853524, "pct": 53.00 },
+      "P2": { "count": 1492580, "pct": 27.72 },
+      "P3P4_merged": { "count": 576387, "pct": 10.71 },
+      "P5": { "count": 461090, "pct": 8.56 }
+    },
+    "2012": {
+      "total_patients": 5288163, "k": 5, "phenotypes": ["P1","P2","P3","P4","P5"],
+      "P1": { "count": 2604010, "pct": 49.24 },
+      "P2": { "count": 1239202, "pct": 23.43 },
+      "P3": { "count": 719451,  "pct": 13.61 },
+      "P4": { "count": 471163,  "pct": 8.91 },
+      "P5": { "count": 254337,  "pct": 4.81 }
+    },
+    "2013": {
+      "total_patients": 5086242, "k": 5, "phenotypes": ["P1","P2","P3","P4","P5"],
+      "P1": { "count": 2449833, "pct": 48.17 },
+      "P2": { "count": 1207560, "pct": 23.74 },
+      "P3": { "count": 721051,  "pct": 14.18 },
+      "P4": { "count": 451747,  "pct": 8.88 },
+      "P5": { "count": 256051,  "pct": 5.03 }
+    },
+    "2014": {
+      "total_patients": 5003732, "k": 5, "phenotypes": ["P1","P2","P3","P4","P5"],
+      "P1": { "count": 2302095, "pct": 46.01 },
+      "P2": { "count": 1198608, "pct": 23.95 },
+      "P3": { "count": 737689,  "pct": 14.74 },
+      "P4": { "count": 475307,  "pct": 9.50 },
+      "P5": { "count": 290033,  "pct": 5.80 }
+    },
+    "2015": {
+      "total_patients": 4961972, "k": 5, "phenotypes": ["P1","P2","P3","P4","P5"],
+      "P1": { "count": 2317242, "pct": 46.70 },
+      "P2": { "count": 1231535, "pct": 24.82 },
+      "P3": { "count": 726689,  "pct": 14.65 },
+      "P4": { "count": 444845,  "pct": 8.97 },
+      "P5": { "count": 241661,  "pct": 4.87 }
+    },
+    "2016": {
+      "total_patients": 4898321, "k": 4, "phenotypes": ["P1","P2","P3P4_merged","P5"],
+      "P1": { "count": 2419216, "pct": 49.39 },
+      "P2": { "count": 773501,  "pct": 15.79 },
+      "P3P4_merged": { "count": 1376733, "pct": 28.11 },
+      "P5": { "count": 328871,  "pct": 6.71 }
+    },
+    "2017": {
+      "total_patients": 1717334, "k": 5, "phenotypes": ["P1","P2","P3","P4","P5"],
+      "note": "Partial year — significantly smaller cohort.",
+      "P1": { "count": 735633, "pct": 42.84 },
+      "P2": { "count": 416803, "pct": 24.27 },
+      "P3": { "count": 293020, "pct": 17.06 },
+      "P4": { "count": 181340, "pct": 10.56 },
+      "P5": { "count": 90538,  "pct": 5.27 }
+    }
+  },
+
+  "phenotype_feature_profiles": {
+    "description": "Centroid feature means per phenotype per year. Used by Phenotype Explorer page. Key features: AGE_std (standardized age), chronic_rx_flag (chronic medication %, binary), dx_unique_count_log (diagnosis burden), inpatient_admissions_log, has_inpatient (% any admission), outpatient_visits_log, prescription_count_log, polypharmacy_flag (% polypharmacy), rx_atc_uniq_count_log (medication diversity), dx_chapter_I_uniq (cardiovascular diagnoses — strongest discriminator between P4/P5).",
+    "2010": {
+      "P1":          { "AGE_std": -0.664, "chronic_rx_flag": 0.018, "dx_unique_count_log": 1.065, "inpatient_admissions_log": 0.045, "has_inpatient": 0.056, "outpatient_visits_log": 1.079, "prescription_count_log": 0.186, "polypharmacy_flag": 0.001, "rx_atc_uniq_count_log": 0.152, "dx_chapter_I_uniq": 0.147 },
+      "P2":          { "AGE_std": 0.518,  "chronic_rx_flag": 0.925, "dx_unique_count_log": 1.628, "inpatient_admissions_log": 0.107, "has_inpatient": 0.121, "outpatient_visits_log": 1.359, "prescription_count_log": 2.745, "polypharmacy_flag": 0.345, "rx_atc_uniq_count_log": 1.327, "dx_chapter_I_uniq": 1.636 },
+      "P3P4_merged": { "AGE_std": 0.103,  "chronic_rx_flag": 0.729, "dx_unique_count_log": 2.529, "inpatient_admissions_log": 0.558, "has_inpatient": 0.522, "outpatient_visits_log": 2.377, "prescription_count_log": 2.497, "polypharmacy_flag": 0.523, "rx_atc_uniq_count_log": 1.392, "dx_chapter_I_uniq": 2.015 },
+      "P5":          { "AGE_std": 0.767,  "chronic_rx_flag": 0.959, "dx_unique_count_log": 2.539, "inpatient_admissions_log": 0.749, "has_inpatient": 0.632, "outpatient_visits_log": 2.044, "prescription_count_log": 3.418, "polypharmacy_flag": 0.834, "rx_atc_uniq_count_log": 1.842, "dx_chapter_I_uniq": 5.604 }
+    },
+    "2011": {
+      "P1":          { "AGE_std": -0.655, "chronic_rx_flag": 0.018, "dx_unique_count_log": 1.073, "inpatient_admissions_log": 0.045, "has_inpatient": 0.056, "outpatient_visits_log": 1.080, "prescription_count_log": 0.182, "polypharmacy_flag": 0.001, "rx_atc_uniq_count_log": 0.148, "dx_chapter_I_uniq": 0.143 },
+      "P2":          { "AGE_std": 0.525,  "chronic_rx_flag": 0.933, "dx_unique_count_log": 1.623, "inpatient_admissions_log": 0.104, "has_inpatient": 0.117, "outpatient_visits_log": 1.354, "prescription_count_log": 2.771, "polypharmacy_flag": 0.363, "rx_atc_uniq_count_log": 1.318, "dx_chapter_I_uniq": 1.613 },
+      "P3P4_merged": { "AGE_std": 0.137,  "chronic_rx_flag": 0.750, "dx_unique_count_log": 2.548, "inpatient_admissions_log": 0.575, "has_inpatient": 0.529, "outpatient_visits_log": 2.392, "prescription_count_log": 2.578, "polypharmacy_flag": 0.549, "rx_atc_uniq_count_log": 1.417, "dx_chapter_I_uniq": 2.092 },
+      "P5":          { "AGE_std": 0.782,  "chronic_rx_flag": 0.960, "dx_unique_count_log": 2.540, "inpatient_admissions_log": 0.738, "has_inpatient": 0.622, "outpatient_visits_log": 2.054, "prescription_count_log": 3.453, "polypharmacy_flag": 0.844, "rx_atc_uniq_count_log": 1.841, "dx_chapter_I_uniq": 5.567 }
+    },
+    "2012": {
+      "P1": { "AGE_std": -0.648, "chronic_rx_flag": 0.018, "dx_unique_count_log": 1.016, "inpatient_admissions_log": 0.032, "has_inpatient": 0.039, "outpatient_visits_log": 1.029, "prescription_count_log": 0.165, "polypharmacy_flag": 0.000, "rx_atc_uniq_count_log": 0.133, "dx_chapter_I_uniq": 0.137 },
+      "P2": { "AGE_std": 0.584,  "chronic_rx_flag": 0.949, "dx_unique_count_log": 1.557, "inpatient_admissions_log": 0.087, "has_inpatient": 0.100, "outpatient_visits_log": 1.250, "prescription_count_log": 2.817, "polypharmacy_flag": 0.386, "rx_atc_uniq_count_log": 1.321, "dx_chapter_I_uniq": 1.709 },
+      "P3": { "AGE_std": -0.101, "chronic_rx_flag": 0.544, "dx_unique_count_log": 2.085, "inpatient_admissions_log": 0.301, "has_inpatient": 0.333, "outpatient_visits_log": 2.013, "prescription_count_log": 1.812, "polypharmacy_flag": 0.276, "rx_atc_uniq_count_log": 0.999, "dx_chapter_I_uniq": 0.841 },
+      "P4": { "AGE_std": 0.806,  "chronic_rx_flag": 0.963, "dx_unique_count_log": 2.525, "inpatient_admissions_log": 0.696, "has_inpatient": 0.595, "outpatient_visits_log": 2.040, "prescription_count_log": 3.462, "polypharmacy_flag": 0.859, "rx_atc_uniq_count_log": 1.850, "dx_chapter_I_uniq": 5.394 },
+      "P5": { "AGE_std": 0.397,  "chronic_rx_flag": 0.920, "dx_unique_count_log": 2.928, "inpatient_admissions_log": 0.884, "has_inpatient": 0.697, "outpatient_visits_log": 2.670, "prescription_count_log": 3.284, "polypharmacy_flag": 0.801, "rx_atc_uniq_count_log": 1.814, "dx_chapter_I_uniq": 3.778 }
+    },
+    "2013": {
+      "P1": { "AGE_std": -0.661, "chronic_rx_flag": 0.020, "dx_unique_count_log": 1.026, "inpatient_admissions_log": 0.035, "has_inpatient": 0.043, "outpatient_visits_log": 1.037, "prescription_count_log": 0.180, "polypharmacy_flag": 0.000, "rx_atc_uniq_count_log": 0.145, "dx_chapter_I_uniq": 0.140 },
+      "P2": { "AGE_std": 0.590,  "chronic_rx_flag": 0.952, "dx_unique_count_log": 1.565, "inpatient_admissions_log": 0.089, "has_inpatient": 0.102, "outpatient_visits_log": 1.260, "prescription_count_log": 2.858, "polypharmacy_flag": 0.365, "rx_atc_uniq_count_log": 1.327, "dx_chapter_I_uniq": 1.692 },
+      "P3": { "AGE_std": -0.074, "chronic_rx_flag": 0.565, "dx_unique_count_log": 2.090, "inpatient_admissions_log": 0.298, "has_inpatient": 0.328, "outpatient_visits_log": 1.985, "prescription_count_log": 1.894, "polypharmacy_flag": 0.285, "rx_atc_uniq_count_log": 1.034, "dx_chapter_I_uniq": 0.843 },
+      "P4": { "AGE_std": 0.822,  "chronic_rx_flag": 0.964, "dx_unique_count_log": 2.542, "inpatient_admissions_log": 0.704, "has_inpatient": 0.598, "outpatient_visits_log": 2.043, "prescription_count_log": 3.507, "polypharmacy_flag": 0.850, "rx_atc_uniq_count_log": 1.857, "dx_chapter_I_uniq": 5.386 },
+      "P5": { "AGE_std": 0.446,  "chronic_rx_flag": 0.927, "dx_unique_count_log": 2.932, "inpatient_admissions_log": 0.884, "has_inpatient": 0.694, "outpatient_visits_log": 2.649, "prescription_count_log": 3.346, "polypharmacy_flag": 0.803, "rx_atc_uniq_count_log": 1.826, "dx_chapter_I_uniq": 3.764 }
+    },
+    "2014": {
+      "P1": { "AGE_std": -0.679, "chronic_rx_flag": 0.020, "dx_unique_count_log": 1.034, "inpatient_admissions_log": 0.037, "has_inpatient": 0.045, "outpatient_visits_log": 1.029, "prescription_count_log": 0.188, "polypharmacy_flag": 0.000, "rx_atc_uniq_count_log": 0.151, "dx_chapter_I_uniq": 0.148 },
+      "P2": { "AGE_std": 0.599,  "chronic_rx_flag": 0.953, "dx_unique_count_log": 1.572, "inpatient_admissions_log": 0.091, "has_inpatient": 0.104, "outpatient_visits_log": 1.257, "prescription_count_log": 2.866, "polypharmacy_flag": 0.361, "rx_atc_uniq_count_log": 1.333, "dx_chapter_I_uniq": 1.709 },
+      "P3": { "AGE_std": -0.109, "chronic_rx_flag": 0.534, "dx_unique_count_log": 2.059, "inpatient_admissions_log": 0.285, "has_inpatient": 0.317, "outpatient_visits_log": 1.958, "prescription_count_log": 1.802, "polypharmacy_flag": 0.252, "rx_atc_uniq_count_log": 0.994, "dx_chapter_I_uniq": 0.764 },
+      "P4": { "AGE_std": 0.829,  "chronic_rx_flag": 0.965, "dx_unique_count_log": 2.544, "inpatient_admissions_log": 0.688, "has_inpatient": 0.585, "outpatient_visits_log": 2.047, "prescription_count_log": 3.518, "polypharmacy_flag": 0.850, "rx_atc_uniq_count_log": 1.861, "dx_chapter_I_uniq": 5.312 },
+      "P5": { "AGE_std": 0.454,  "chronic_rx_flag": 0.920, "dx_unique_count_log": 2.911, "inpatient_admissions_log": 0.848, "has_inpatient": 0.673, "outpatient_visits_log": 2.630, "prescription_count_log": 3.315, "polypharmacy_flag": 0.786, "rx_atc_uniq_count_log": 1.804, "dx_chapter_I_uniq": 3.623 }
+    },
+    "2015": {
+      "P1": { "AGE_std": -0.667, "chronic_rx_flag": 0.021, "dx_unique_count_log": 1.051, "inpatient_admissions_log": 0.038, "has_inpatient": 0.047, "outpatient_visits_log": 1.036, "prescription_count_log": 0.203, "polypharmacy_flag": 0.000, "rx_atc_uniq_count_log": 0.163, "dx_chapter_I_uniq": 0.149 },
+      "P2": { "AGE_std": 0.612,  "chronic_rx_flag": 0.955, "dx_unique_count_log": 1.589, "inpatient_admissions_log": 0.092, "has_inpatient": 0.106, "outpatient_visits_log": 1.260, "prescription_count_log": 2.876, "polypharmacy_flag": 0.349, "rx_atc_uniq_count_log": 1.337, "dx_chapter_I_uniq": 1.720 },
+      "P3": { "AGE_std": -0.037, "chronic_rx_flag": 0.579, "dx_unique_count_log": 2.124, "inpatient_admissions_log": 0.303, "has_inpatient": 0.334, "outpatient_visits_log": 1.987, "prescription_count_log": 1.948, "polypharmacy_flag": 0.293, "rx_atc_uniq_count_log": 1.058, "dx_chapter_I_uniq": 0.886 },
+      "P4": { "AGE_std": 0.840,  "chronic_rx_flag": 0.962, "dx_unique_count_log": 2.575, "inpatient_admissions_log": 0.705, "has_inpatient": 0.597, "outpatient_visits_log": 2.054, "prescription_count_log": 3.510, "polypharmacy_flag": 0.842, "rx_atc_uniq_count_log": 1.857, "dx_chapter_I_uniq": 5.416 },
+      "P5": { "AGE_std": 0.478,  "chronic_rx_flag": 0.929, "dx_unique_count_log": 2.970, "inpatient_admissions_log": 0.885, "has_inpatient": 0.690, "outpatient_visits_log": 2.685, "prescription_count_log": 3.366, "polypharmacy_flag": 0.797, "rx_atc_uniq_count_log": 1.831, "dx_chapter_I_uniq": 3.782 }
+    },
+    "2016": {
+      "P1":          { "AGE_std": -0.631, "chronic_rx_flag": 0.064, "dx_unique_count_log": 1.062, "inpatient_admissions_log": 0.039, "has_inpatient": 0.048, "outpatient_visits_log": 1.046, "prescription_count_log": 0.300, "polypharmacy_flag": 0.002, "rx_atc_uniq_count_log": 0.207, "dx_chapter_I_uniq": 0.179 },
+      "P2":          { "AGE_std": 0.729,  "chronic_rx_flag": 0.971, "dx_unique_count_log": 1.802, "inpatient_admissions_log": 0.200, "has_inpatient": 0.200, "outpatient_visits_log": 1.406, "prescription_count_log": 3.104, "polypharmacy_flag": 0.480, "rx_atc_uniq_count_log": 1.478, "dx_chapter_I_uniq": 2.550 },
+      "P3P4_merged": { "AGE_std": 0.048,  "chronic_rx_flag": 0.628, "dx_unique_count_log": 2.160, "inpatient_admissions_log": 0.320, "has_inpatient": 0.345, "outpatient_visits_log": 1.995, "prescription_count_log": 2.095, "polypharmacy_flag": 0.330, "rx_atc_uniq_count_log": 1.122, "dx_chapter_I_uniq": 1.068 },
+      "P5":          { "AGE_std": 0.617,  "chronic_rx_flag": 0.954, "dx_unique_count_log": 2.979, "inpatient_admissions_log": 0.966, "has_inpatient": 0.725, "outpatient_visits_log": 2.611, "prescription_count_log": 3.488, "polypharmacy_flag": 0.839, "rx_atc_uniq_count_log": 1.893, "dx_chapter_I_uniq": 4.754 }
+    },
+    "2017": {
+      "P1": { "AGE_std": -0.542, "chronic_rx_flag": 0.015, "dx_unique_count_log": 0.957, "inpatient_admissions_log": 0.032, "has_inpatient": 0.040, "outpatient_visits_log": 0.886, "prescription_count_log": 0.148, "polypharmacy_flag": 0.000, "rx_atc_uniq_count_log": 0.123, "dx_chapter_I_uniq": 0.124 },
+      "P2": { "AGE_std": 0.766,  "chronic_rx_flag": 0.670, "dx_unique_count_log": 1.404, "inpatient_admissions_log": 0.065, "has_inpatient": 0.077, "outpatient_visits_log": 0.907, "prescription_count_log": 1.528, "polypharmacy_flag": 0.160, "rx_atc_uniq_count_log": 1.158, "dx_chapter_I_uniq": 1.660 },
+      "P3": { "AGE_std": 0.388,  "chronic_rx_flag": 0.506, "dx_unique_count_log": 1.827, "inpatient_admissions_log": 0.135, "has_inpatient": 0.158, "outpatient_visits_log": 1.165, "prescription_count_log": 1.349, "polypharmacy_flag": 0.202, "rx_atc_uniq_count_log": 1.037, "dx_chapter_I_uniq": 0.908 },
+      "P4": { "AGE_std": 0.970,  "chronic_rx_flag": 0.881, "dx_unique_count_log": 2.233, "inpatient_admissions_log": 0.338, "has_inpatient": 0.345, "outpatient_visits_log": 1.196, "prescription_count_log": 2.093, "polypharmacy_flag": 0.661, "rx_atc_uniq_count_log": 1.628, "dx_chapter_I_uniq": 4.528 },
+      "P5": { "AGE_std": 0.553,  "chronic_rx_flag": 0.686, "dx_unique_count_log": 2.534, "inpatient_admissions_log": 0.396, "has_inpatient": 0.403, "outpatient_visits_log": 1.517, "prescription_count_log": 1.718, "polypharmacy_flag": 0.449, "rx_atc_uniq_count_log": 1.344, "dx_chapter_I_uniq": 2.274 }
+    }
+  },
+
+  "transition_matrices": {
+    "description": "Row-percentage transition matrices. Cell [from][to] = % of patients in 'from' phenotype in year 1 who moved to 'to' phenotype in year 2. Rows sum to 100%.",
+    "how_to_read": "E.g. transitions['2016_2017']['P1']['P4'] = 0.38 means 0.38% of P1 patients in 2016 were in P4 in 2017.",
+    "2010_2011": {
+      "note": "Both years k=4. P3P4_merged used instead of separate P3/P4.",
+      "P1":          { "P1": 86.87, "P2": 7.25,  "P3P4_merged": 5.30,  "P5": 0.58 },
+      "P2":          { "P1": 7.23,  "P2": 71.41, "P3P4_merged": 11.09, "P5": 10.27 },
+      "P3P4_merged": { "P1": 16.05, "P2": 24.00, "P3P4_merged": 49.62, "P5": 10.33 },
+      "P5":          { "P1": 1.42,  "P2": 25.41, "P3P4_merged": 13.39, "P5": 59.78 }
+    },
+    "2011_2012": {
+      "note": "From 4-cluster (P3P4_merged) to 5-cluster (separate P3, P4).",
+      "P1":          { "P1": 81.31, "P2": 4.95,  "P3": 12.53, "P4": 0.56,  "P5": 0.65 },
+      "P2":          { "P1": 6.49,  "P2": 62.54, "P3": 17.09, "P4": 10.52, "P5": 3.36 },
+      "P3P4_merged": { "P1": 11.93, "P2": 14.97, "P3": 32.60, "P4": 11.41, "P5": 29.09 },
+      "P5":          { "P1": 1.17,  "P2": 23.16, "P3": 4.44,  "P4": 59.65, "P5": 11.57 }
+    },
+    "2012_2013": {
+      "note": "Both years k=5. Full P1–P5 matrix.",
+      "P1": { "P1": 82.36, "P2": 5.06,  "P3": 11.50, "P4": 0.54,  "P5": 0.55 },
+      "P2": { "P1": 5.11,  "P2": 67.90, "P3": 13.29, "P4": 10.86, "P5": 2.83 },
+      "P3": { "P1": 25.54, "P2": 21.64, "P3": 40.35, "P4": 4.08,  "P5": 8.39 },
+      "P4": { "P1": 1.15,  "P2": 24.74, "P3": 5.17,  "P4": 57.30, "P5": 11.64 },
+      "P5": { "P1": 3.02,  "P2": 9.36,  "P3": 19.68, "P4": 18.87, "P5": 49.07 }
+    },
+    "2013_2014": {
+      "note": "Both years k=5. Full P1–P5 matrix.",
+      "P1": { "P1": 80.32, "P2": 5.14,  "P3": 13.24, "P4": 0.57,  "P5": 0.73 },
+      "P2": { "P1": 4.75,  "P2": 66.96, "P3": 13.15, "P4": 11.79, "P5": 3.36 },
+      "P3": { "P1": 23.31, "P2": 21.47, "P3": 40.20, "P4": 4.89,  "P5": 10.14 },
+      "P4": { "P1": 1.02,  "P2": 23.34, "P3": 3.76,  "P4": 59.42, "P5": 12.46 },
+      "P5": { "P1": 2.72,  "P2": 9.11,  "P3": 16.56, "P4": 20.26, "P5": 51.35 }
+    },
+    "2014_2015": {
+      "note": "Both years k=5. Full P1–P5 matrix.",
+      "P1": { "P1": 82.34, "P2": 4.97,  "P3": 11.67, "P4": 0.51,  "P5": 0.51 },
+      "P2": { "P1": 4.79,  "P2": 68.83, "P3": 13.22, "P4": 10.58, "P5": 2.58 },
+      "P3": { "P1": 27.16, "P2": 21.90, "P3": 40.62, "P4": 3.36,  "P5": 6.97 },
+      "P4": { "P1": 1.10,  "P2": 25.34, "P3": 6.13,  "P4": 56.66, "P5": 10.77 },
+      "P5": { "P1": 3.26,  "P2": 10.16, "P3": 22.00, "P4": 18.97, "P5": 45.61 }
+    },
+    "2015_2016": {
+      "note": "From 5-cluster (2015) to 4-cluster (2016). P3 and P4 rows go into P3P4_merged column.",
+      "P1": { "P1": 84.50, "P2": 3.40,  "P3P4_merged": 11.65, "P5": 0.46 },
+      "P2": { "P1": 9.59,  "P2": 70.85, "P3P4_merged": 15.38, "P5": 4.18 },
+      "P3": { "P1": 26.85, "P2": 21.08, "P3P4_merged": 43.26, "P5": 8.81 },
+      "P4": { "P1": 1.18,  "P2": 63.09, "P3P4_merged": 10.12, "P5": 25.62 },
+      "P5": { "P1": 2.99,  "P2": 16.68, "P3P4_merged": 24.26, "P5": 56.07 }
+    },
+    "2016_2017": {
+      "note": "From 4-cluster (P3P4_merged) to 5-cluster (separate P3, P4).",
+      "P1":          { "P1": 85.64, "P2": 4.86,  "P3": 7.98,  "P4": 0.38,  "P5": 1.14 },
+      "P2":          { "P1": 9.02,  "P2": 53.37, "P3": 13.90, "P4": 21.69, "P5": 2.03 },
+      "P3P4_merged": { "P1": 30.02, "P2": 20.37, "P3": 38.10, "P4": 4.26,  "P5": 7.24 },
+      "P5":          { "P1": 3.58,  "P2": 16.68, "P3": 24.10, "P4": 30.48, "P5": 25.16 }
+    }
+  },
+
+  "cohort_trajectories": {
+    "description": "All pre-computed cohort trajectories. Patients starting in a given phenotype+year tracked forward. 'summary' = year-1 transition outcomes. 'yearly_distribution' = % of original cohort in each phenotype per year (cohort_size shrinks as patients age out of dataset).",
+    "2010_P1":          { "cohort_size": 2838137, "summary": { "persisted_pct": 87.7, "progressed_pct": 12.3, "improved_pct": 0.0 }, "distribution": { "2010": { "P1": 100.0 }, "2011": { "P1": 87.66, "P2": 8.73, "P3P4_merged": 2.93, "P5": 0.67 }, "2012": { "P1": 80.93, "P2": 11.17, "P3": 0.95, "P4": 6.34, "P5": 0.6 }, "2013": { "P1": 77.44, "P2": 13.88, "P3": 1.22, "P4": 6.73, "P5": 0.72 }, "2014": { "P1": 73.94, "P2": 16.44, "P3": 1.62, "P4": 7.13, "P5": 0.86 }, "2015": { "P1": 71.58, "P2": 18.36, "P3": 1.97, "P4": 7.13, "P5": 0.96 }, "2016": { "P1": 74.16, "P2": 20.45, "P3P4_merged": 4.36, "P5": 1.04 } } },
+    "2010_P2":          { "cohort_size": 1591039, "summary": { "persisted_pct": 70.3, "progressed_pct": 21.0, "improved_pct": 8.7 }, "distribution": { "2010": { "P2": 100.0 }, "2011": { "P1": 8.71, "P2": 70.31, "P3P4_merged": 17.06, "P5": 3.92 }, "2012": { "P1": 8.72, "P2": 65.25, "P3": 15.44, "P4": 6.1, "P5": 4.49 }, "2013": { "P1": 8.55, "P2": 63.61, "P3": 16.6, "P4": 6.17, "P5": 5.07 }, "2014": { "P1": 8.02, "P2": 61.98, "P3": 18.29, "P4": 6.11, "P5": 5.61 }, "2015": { "P1": 7.77, "P2": 60.66, "P3": 19.23, "P4": 6.49, "P5": 5.85 }, "2016": { "P1": 8.32, "P2": 65.26, "P3P4_merged": 21.44, "P5": 4.99 } } },
+    "2010_P3P4_merged":  { "cohort_size": 658213,  "summary": { "persisted_pct": 48.3, "progressed_pct": 11.3, "improved_pct": 40.4 }, "distribution": { "2010": { "P3P4_merged": 100.0 }, "2011": { "P1": 6.8, "P2": 33.61, "P3P4_merged": 48.32, "P5": 11.28 }, "2012": { "P1": 6.33, "P2": 31.96, "P3": 42.5, "P4": 7.91, "P5": 11.3 }, "2013": { "P1": 6.44, "P2": 33.1, "P3": 41.62, "P4": 7.19, "P5": 11.65 }, "2014": { "P1": 6.36, "P2": 32.83, "P3": 41.88, "P4": 6.78, "P5": 12.15 }, "2015": { "P1": 6.39, "P2": 32.88, "P3": 41.68, "P4": 6.89, "P5": 12.15 }, "2016": { "P1": 7.4, "P2": 40.0, "P3P4_merged": 43.15, "P5": 9.45 } } },
+    "2010_P5":           { "cohort_size": 211131,  "summary": { "persisted_pct": 40.6, "progressed_pct": 0.0,  "improved_pct": 59.4 }, "distribution": { "2010": { "P5": 100.0 }, "2011": { "P1": 5.08, "P2": 21.69, "P3P4_merged": 32.67, "P5": 40.57 }, "2012": { "P1": 4.0, "P2": 23.38, "P3": 29.83, "P4": 9.05, "P5": 33.75 }, "2013": { "P1": 4.18, "P2": 25.05, "P3": 31.18, "P4": 8.37, "P5": 31.21 }, "2014": { "P1": 4.1, "P2": 25.46, "P3": 32.39, "P4": 8.11, "P5": 29.94 }, "2015": { "P1": 4.34, "P2": 26.28, "P3": 32.96, "P4": 7.88, "P5": 28.54 }, "2016": { "P1": 5.24, "P2": 32.03, "P3P4_merged": 40.19, "P5": 22.54 } } },
+    "2011_P1":          { "cohort_size": 2873745, "summary": { "persisted_pct": 83.6, "progressed_pct": 16.4, "improved_pct": 0.0 }, "distribution": { "2011": { "P1": 100.0 }, "2012": { "P1": 83.63, "P2": 8.33, "P3": 0.59, "P4": 6.98, "P5": 0.46 }, "2013": { "P1": 80.54, "P2": 11.47, "P3": 0.91, "P4": 6.48, "P5": 0.6 }, "2014": { "P1": 76.6, "P2": 14.3, "P3": 1.29, "P4": 7.07, "P5": 0.74 }, "2015": { "P1": 74.09, "P2": 16.42, "P3": 1.61, "P4": 7.04, "P5": 0.84 }, "2016": { "P1": 76.63, "P2": 18.51, "P3P4_merged": 3.93, "P5": 0.93 } } },
+    "2011_P2":          { "cohort_size": 1612788, "summary": { "persisted_pct": 68.8, "progressed_pct": 23.1, "improved_pct": 8.1 }, "distribution": { "2011": { "P2": 100.0 }, "2012": { "P1": 8.06, "P2": 68.84, "P3": 13.39, "P4": 6.08, "P5": 3.64 }, "2013": { "P1": 8.43, "P2": 66.29, "P3": 14.68, "P4": 6.11, "P5": 4.5 }, "2014": { "P1": 8.05, "P2": 64.09, "P3": 16.58, "P4": 6.15, "P5": 5.13 }, "2015": { "P1": 7.81, "P2": 62.65, "P3": 17.6, "P4": 6.48, "P5": 5.45 }, "2016": { "P1": 8.49, "P2": 66.77, "P3P4_merged": 20.08, "P5": 4.66 } } },
+    "2011_P3P4_merged":  { "cohort_size": 677121,  "summary": { "persisted_pct": 53.1, "progressed_pct": 10.9, "improved_pct": 36.0 }, "distribution": { "2011": { "P3P4_merged": 100.0 }, "2012": { "P1": 5.53, "P2": 30.47, "P3": 44.62, "P4": 8.51, "P5": 10.86 }, "2013": { "P1": 5.75, "P2": 32.67, "P3": 42.99, "P4": 7.45, "P5": 11.13 }, "2014": { "P1": 5.81, "P2": 32.52, "P3": 43.04, "P4": 6.93, "P5": 11.7 }, "2015": { "P1": 5.87, "P2": 32.57, "P3": 42.77, "P4": 7.02, "P5": 11.77 }, "2016": { "P1": 6.84, "P2": 40.17, "P3P4_merged": 43.68, "P5": 9.31 } } },
+    "2011_P5":           { "cohort_size": 219927,  "summary": { "persisted_pct": 39.0, "progressed_pct": 0.0,  "improved_pct": 61.0 }, "distribution": { "2011": { "P5": 100.0 }, "2012": { "P1": 3.36, "P2": 19.23, "P3": 27.92, "P4": 10.53, "P5": 38.96 }, "2013": { "P1": 3.75, "P2": 23.19, "P3": 30.91, "P4": 8.64, "P5": 33.51 }, "2014": { "P1": 3.79, "P2": 24.33, "P3": 32.19, "P4": 8.16, "P5": 31.53 }, "2015": { "P1": 4.1, "P2": 25.11, "P3": 33.23, "P4": 7.87, "P5": 29.68 }, "2016": { "P1": 5.02, "P2": 30.78, "P3P4_merged": 40.91, "P5": 23.29 } } },
+    "2012_P1":  { "cohort_size": 2669885, "summary": { "persisted_pct": 83.5, "progressed_pct": 16.5, "improved_pct": 0.0 }, "distribution": { "2012": { "P1": 100.0 }, "2013": { "P1": 83.5, "P2": 8.77, "P3": 0.57, "P4": 6.73, "P5": 0.43 }, "2014": { "P1": 80.13, "P2": 12.07, "P3": 0.96, "P4": 6.23, "P5": 0.61 }, "2015": { "P1": 77.06, "P2": 14.47, "P3": 1.29, "P4": 6.46, "P5": 0.71 }, "2016": { "P1": 79.11, "P2": 16.62, "P3P4_merged": 3.44, "P5": 0.83 } } },
+    "2012_P2":  { "cohort_size": 1530753, "summary": { "persisted_pct": 70.4, "progressed_pct": 21.6, "improved_pct": 8.0 }, "distribution": { "2012": { "P2": 100.0 }, "2013": { "P1": 8.01, "P2": 70.4, "P3": 12.0, "P4": 5.99, "P5": 3.6 }, "2014": { "P1": 8.13, "P2": 67.19, "P3": 14.15, "P4": 6.06, "P5": 4.46 }, "2015": { "P1": 8.04, "P2": 65.14, "P3": 15.47, "P4": 6.48, "P5": 4.88 }, "2016": { "P1": 8.78, "P2": 68.55, "P3P4_merged": 18.37, "P5": 4.29 } } },
+    "2012_P3":  { "cohort_size": 532123,  "summary": { "persisted_pct": 55.3, "progressed_pct": 15.2, "improved_pct": 29.5 }, "distribution": { "2012": { "P3": 100.0 }, "2013": { "P1": 1.02, "P2": 28.49, "P3": 55.26, "P4": 3.59, "P5": 11.64 }, "2014": { "P1": 1.15, "P2": 29.24, "P3": 53.81, "P4": 3.45, "P5": 12.36 }, "2015": { "P1": 1.23, "P2": 29.4, "P3": 52.82, "P4": 3.94, "P5": 12.62 }, "2016": { "P1": 1.57, "P2": 38.52, "P3P4_merged": 50.09, "P5": 9.82 } } },
+    "2012_P4":  { "cohort_size": 348205,  "summary": { "persisted_pct": 21.1, "progressed_pct": 6.0,  "improved_pct": 72.9 }, "distribution": { "2012": { "P4": 100.0 }, "2013": { "P1": 33.65, "P2": 30.74, "P3": 8.49, "P4": 21.12, "P5": 6.0 }, "2014": { "P1": 32.85, "P2": 31.93, "P3": 9.73, "P4": 19.85, "P5": 5.63 }, "2015": { "P1": 33.19, "P2": 32.76, "P3": 10.63, "P4": 17.85, "P5": 5.56 }, "2016": { "P1": 39.43, "P2": 36.76, "P3P4_merged": 18.99, "P5": 4.82 } } },
+    "2012_P5":  { "cohort_size": 207197,  "summary": { "persisted_pct": 40.6, "progressed_pct": 0.0,  "improved_pct": 59.4 }, "distribution": { "2012": { "P5": 100.0 }, "2013": { "P1": 2.09, "P2": 18.41, "P3": 30.65, "P4": 8.28, "P5": 40.57 }, "2014": { "P1": 2.17, "P2": 21.73, "P3": 33.63, "P4": 6.95, "P5": 35.52 }, "2015": { "P1": 2.32, "P2": 23.04, "P3": 35.12, "P4": 6.76, "P5": 32.76 }, "2016": { "P1": 2.92, "P2": 28.95, "P3P4_merged": 42.66, "P5": 25.47 } } },
+    "2013_P1":  { "cohort_size": 2507668, "summary": { "persisted_pct": 82.7, "progressed_pct": 17.3, "improved_pct": 0.0 }, "distribution": { "2013": { "P1": 100.0 }, "2014": { "P1": 82.68, "P2": 9.06, "P3": 0.61, "P4": 7.22, "P5": 0.43 }, "2015": { "P1": 80.4, "P2": 11.93, "P3": 0.96, "P4": 6.13, "P5": 0.58 }, "2016": { "P1": 82.11, "P2": 14.18, "P3P4_merged": 3.01, "P5": 0.7 } } },
+    "2013_P2":  { "cohort_size": 1505729, "summary": { "persisted_pct": 69.8, "progressed_pct": 22.5, "improved_pct": 7.7 }, "distribution": { "2013": { "P2": 100.0 }, "2014": { "P1": 7.65, "P2": 69.85, "P3": 12.8, "P4": 5.97, "P5": 3.73 }, "2015": { "P1": 7.97, "P2": 66.86, "P3": 14.35, "P4": 6.4, "P5": 4.41 }, "2016": { "P1": 8.92, "P2": 69.69, "P3P4_merged": 17.42, "P5": 3.96 } } },
+    "2013_P3":  { "cohort_size": 525366,  "summary": { "persisted_pct": 56.5, "progressed_pct": 15.5, "improved_pct": 28.0 }, "distribution": { "2013": { "P3": 100.0 }, "2014": { "P1": 0.89, "P2": 27.1, "P3": 56.47, "P4": 3.48, "P5": 12.06 }, "2015": { "P1": 1.07, "P2": 28.24, "P3": 54.43, "P4": 3.88, "P5": 12.39 }, "2016": { "P1": 1.41, "P2": 37.75, "P3P4_merged": 51.18, "P5": 9.65 } } },
+    "2013_P4":  { "cohort_size": 340447,  "summary": { "persisted_pct": 21.3, "progressed_pct": 6.0,  "improved_pct": 72.7 }, "distribution": { "2013": { "P4": 100.0 }, "2014": { "P1": 33.27, "P2": 30.8, "P3": 8.58, "P4": 21.33, "P5": 6.02 }, "2015": { "P1": 32.9, "P2": 32.11, "P3": 9.56, "P4": 19.93, "P5": 5.5 }, "2016": { "P1": 40.28, "P2": 36.4, "P3P4_merged": 18.58, "P5": 4.74 } } },
+    "2013_P5":  { "cohort_size": 207032,  "summary": { "persisted_pct": 41.1, "progressed_pct": 0.0,  "improved_pct": 58.9 }, "distribution": { "2013": { "P5": 100.0 }, "2014": { "P1": 1.88, "P2": 18.14, "P3": 30.71, "P4": 8.12, "P5": 41.14 }, "2015": { "P1": 2.11, "P2": 21.97, "P3": 33.79, "P4": 7.06, "P5": 35.07 }, "2016": { "P1": 2.81, "P2": 28.15, "P3P4_merged": 42.2, "P5": 26.84 } } },
+    "2014_P1":  { "cohort_size": 2402412, "summary": { "persisted_pct": 83.1, "progressed_pct": 16.9, "improved_pct": 0.0 }, "distribution": { "2014": { "P1": 100.0 }, "2015": { "P1": 83.08, "P2": 8.82, "P3": 0.59, "P4": 7.1, "P5": 0.41 }, "2016": { "P1": 85.51, "P2": 11.43, "P3P4_merged": 2.48, "P5": 0.59 } } },
+    "2014_P2":  { "cohort_size": 1504706, "summary": { "persisted_pct": 70.0, "progressed_pct": 22.3, "improved_pct": 7.7 }, "distribution": { "2014": { "P2": 100.0 }, "2015": { "P1": 7.74, "P2": 69.97, "P3": 12.46, "P4": 6.23, "P5": 3.6 }, "2016": { "P1": 9.14, "P2": 71.53, "P3P4_merged": 15.77, "P5": 3.56 } } },
+    "2014_P3":  { "cohort_size": 541496,  "summary": { "persisted_pct": 56.2, "progressed_pct": 15.9, "improved_pct": 27.9 }, "distribution": { "2014": { "P3": 100.0 }, "2015": { "P1": 0.87, "P2": 27.01, "P3": 56.19, "P4": 4.12, "P5": 11.81 }, "2016": { "P1": 1.29, "P2": 37.8, "P3P4_merged": 51.72, "P5": 9.19 } } },
+    "2014_P4":  { "cohort_size": 343353,  "summary": { "persisted_pct": 21.1, "progressed_pct": 5.8,  "improved_pct": 73.0 }, "distribution": { "2014": { "P4": 100.0 }, "2015": { "P1": 34.1, "P2": 30.82, "P3": 8.09, "P4": 21.13, "P5": 5.84 }, "2016": { "P1": 41.39, "P2": 35.78, "P3P4_merged": 18.11, "P5": 4.72 } } },
+    "2014_P5":  { "cohort_size": 211765,  "summary": { "persisted_pct": 39.9, "progressed_pct": 0.0,  "improved_pct": 60.1 }, "distribution": { "2014": { "P5": 100.0 }, "2015": { "P1": 1.86, "P2": 18.6, "P3": 30.86, "P4": 8.8, "P5": 39.89 }, "2016": { "P1": 2.78, "P2": 26.74, "P3P4_merged": 41.8, "P5": 28.67 } } },
+    "2015_P1":  { "cohort_size": 2359178, "summary": { "persisted_pct": 88.8, "progressed_pct": 11.2, "improved_pct": 0.0 }, "distribution": { "2015": { "P1": 100.0 }, "2016": { "P1": 88.84, "P2": 8.58, "P3P4_merged": 2.12, "P5": 0.45 } } },
+    "2015_P2":  { "cohort_size": 1504846, "summary": { "persisted_pct": 74.2, "progressed_pct": 17.0, "improved_pct": 8.8 }, "distribution": { "2015": { "P2": 100.0 }, "2016": { "P1": 8.82, "P2": 74.21, "P3P4_merged": 14.05, "P5": 2.92 } } },
+    "2015_P3":  { "cohort_size": 542518,  "summary": { "persisted_pct": 0.0,  "progressed_pct": 62.2, "improved_pct": 37.8 }, "distribution": { "2015": { "P3": 100.0 }, "2016": { "P1": 1.1, "P2": 36.67, "P3P4_merged": 53.46, "P5": 8.76 } } },
+    "2015_P4":  { "cohort_size": 346589,  "summary": { "persisted_pct": 20.2, "progressed_pct": 5.7,  "improved_pct": 74.2 }, "distribution": { "2015": { "P4": 100.0 }, "2016": { "P1": 38.05, "P2": 36.12, "P3P4_merged": 20.17, "P5": 5.67 } } },
+    "2015_P5":  { "cohort_size": 208841,  "summary": { "persisted_pct": 33.7, "progressed_pct": 0.0,  "improved_pct": 66.3 }, "distribution": { "2015": { "P5": 100.0 }, "2016": { "P1": 3.33, "P2": 22.42, "P3P4_merged": 40.59, "P5": 33.66 } } },
+    "2016_P1":          { "cohort_size": 2470980, "note": "Single year — no forward data available.", "summary": { "persisted_pct": 100.0, "progressed_pct": 0.0, "improved_pct": 0.0 } },
+    "2016_P2":          { "cohort_size": 1616285, "note": "Single year — no forward data available.", "summary": { "persisted_pct": 100.0, "progressed_pct": 0.0, "improved_pct": 0.0 } },
+    "2016_P3P4_merged": { "cohort_size": 639673,  "note": "Single year — no forward data available.", "summary": { "persisted_pct": 100.0, "progressed_pct": 0.0, "improved_pct": 0.0 } },
+    "2016_P5":          { "cohort_size": 171383,  "note": "Single year — no forward data available.", "summary": { "persisted_pct": 100.0, "progressed_pct": 0.0, "improved_pct": 0.0 } }
+  },
+
+  "key_clinical_statistics": {
+    "p1_stability_by_year": { "2010→2011": "86.87%", "2011→2012": "81.31%", "2012→2013": "82.36%", "2013→2014": "80.32%", "2014→2015": "82.34%", "2015→2016": "84.50%", "2016→2017": "85.64%" },
+    "p4_to_p5_escalation_by_year": { "2012→2013": "11.64%", "2013→2014": "12.46%", "2014→2015": "10.77%", "2015→2016": "25.62% (note: P3P4_merged used in 2016)" },
+    "p5_stability_by_year": { "2010→2011": "59.78%", "2011→2012": "11.57%", "2012→2013": "49.07%", "2013→2014": "51.35%", "2014→2015": "45.61%", "2015→2016": "56.07%", "2016→2017": "25.16%" },
+    "p5_population_share_trend": { "2010": "8.41%", "2011": "8.56%", "2012": "4.81%", "2013": "5.03%", "2014": "5.80%", "2015": "4.87%", "2016": "6.71%", "2017": "5.27%" },
+    "total_patients_trend": { "2010": 5298520, "2011": 5383581, "2012": 5288163, "2013": 5086242, "2014": 5003732, "2015": 4961972, "2016": 4898321, "2017": 1717334 },
+    "escalation_alert_threshold": "Dashboard fires a clinical alert when P4→P5 transition rate exceeds 25%.",
+    "p4_cohort_improvement_rate": "~72–74% of P4 patients improve (move to lower tier) within 1 year — consistent across 2012–2015.",
+    "p5_de_escalation": "~40–60% of P5 patients de-escalate to a lower tier within 1 year."
+  },
+
+  "data_quality": {
+    "description": "Pipeline artifact inventory as checked by /api/validation/artifacts.",
+    "expected_artifacts": [
+      { "name": "global_summaries",       "type": "summary",            "path": "federated_learning/artifacts/global_summaries",             "years_available": ["2010","2011","2012","2013","2014","2015","2016","2017"] },
+      { "name": "yearly_metrics",          "type": "metric",             "path": "federated_learning/artifacts/yearly_metrics",               "years_available": ["2010","2012","2017"] },
+      { "name": "dictionaries",            "type": "definition",         "path": "federated_learning/artifacts/dictionaries",                 "files": ["phenotype_dictionary.json","phenotype_dictionary.csv"] },
+      { "name": "transitions/global",      "type": "transition-folder",  "path": "federated_learning/artifacts/transitions/global",           "pairs_available": ["2010_2011","2011_2012","2012_2013","2013_2014","2014_2015","2015_2016","2016_2017"] },
+      { "name": "transitions/harmonized",  "type": "transition-folder",  "path": "federated_learning/artifacts/transitions/harmonized",       "description": "Per-site harmonized parquet files" }
+    ]
+  },
+
+  "population_forecast": {
+    "description": "Forecast is computed live by the backend using a Markov chain model — it is not pre-stored. The model uses the base distribution for the anchor year and multiplies by the transition matrix (anchored at anchor_year → anchor_year+1) for each horizon step.",
+    "model_notes": "Assumes current transition rates remain stable. For planning use only — not clinical decisions.",
+    "horizon_options": [1, 2, 3, 5],
+    "anchor_years_available": ["2010","2011","2012","2013","2014","2015","2016","2017"]
+  },
+
+  "settings": {
+    "privacy_points": [
+      "PHI fields are never transferred to the dashboard runtime.",
+      "Cell suppression: groups with n < 10 are not displayed.",
+      "Federated runs aggregate per-site centroids, not raw rows.",
+      "Audit log is written to /logs/dashboard-access.log."
+    ],
+    "patient_level_access": "Patient Journey page requires VITE_ENABLE_PATIENT_LEVEL_ACCESS=true environment variable.",
+    "phenotype_palette": {
+      "P1": "#2563EB (blue)",
+      "P2": "#EC2027 (red)",
+      "P3": "#16A34A (green)",
+      "P4": "#D97706 (amber)",
+      "P5": "#7C3AED (purple)",
+      "P3P4_merged": "#B45309 (dark amber)"
+    }
+  },
+
+  "clinical_glossary": {
+    "phenotype": "A patient cluster defined by clinical features. Assigned via K-means on standardized feature vectors.",
+    "risk_tier": "Synonymous with phenotype. Tiers 1–5 (P1–P5) = increasing clinical complexity.",
+    "federated_learning": "ML approach where each hospital site trains locally, sharing only model updates, not raw patient data.",
+    "centroid": "Average feature vector of all patients in a cluster — defines a 'typical' patient in that tier.",
+    "transition_matrix": "Grid showing probability of patients moving from each tier to each tier between two years.",
+    "markov_chain": "Mathematical model using transition probabilities to project future population composition.",
+    "polypharmacy": "Concurrent use of 5+ medications. Higher in P4 and P5.",
+    "escalation": "Patient moves to a higher-numbered (more complex) tier.",
+    "de_escalation": "Patient moves to a lower-numbered tier — clinical improvement.",
+    "P3P4_merged": "Combined P3+P4 cluster in years where k=4 (2010, 2011, 2016). Not a separate phenotype.",
+    "dx_chapter_I_uniq": "Unique cardiovascular diagnoses — the strongest single discriminator between P4/P5 and other tiers.",
+    "cohort": "Group of patients sharing a starting tier+year, tracked forward over time.",
+    "RAG_status": "Red-Amber-Green status: green=low risk, amber=monitor, red=critical."
+  },
+  "drug_adherence":{
+    "app": {
+    "name": "Adherence Intelligence App",
+    "subtitle": "Claims-based medication adherence risk intelligence",
+    "version": "0.1.0-demo",
+    "description": "A federated-learning demonstration app that predicts which antihypertensive (ATC C09) patients are at risk of future medication non-adherence. A model trained only on 2015 prescription behaviour estimates each patient's probability of being non-adherent (PDC < 0.80) in 2016. The app also shows that a federated model trained across 20 regional clients reaches near-centralized accuracy without pooling raw patient data.",
+    "purpose": "Help a non-technical reviewer understand (1) how the patient population splits into adherence risk tiers, (2) how well the model predicts future non-adherence, (3) that federated learning is feasible for multi-site collaboration, and (4) the limits of a claims-based, non-clinical signal.",
+    "intended_use": "Business development demonstration and analytical exploration only. NOT a clinical decision support tool, NOT clinically validated, NOT deployment-ready.",
+    "data_source": "VENY prescription dispensing records (Hungarian national claims).",
+    "medication_group": "C09 — Antihypertensives (ATC C09: ACE inhibitors, ARBs, and related agents).",
+    "observation_window": "2015-01-01 to 2015-12-31 (the year the model 'looks at').",
+    "prediction_window": "2016-01-01 to 2016-12-31 (the year the model 'predicts'; 366 days, leap year).",
+    "target_definition": "A patient is labelled non-adherent if their 2016 PDC (Proportion of Days Covered) is below 0.80.",
+    "technology": "Next.js (React) frontend reading prepared CSV/JSON/Parquet app data. Models built in scikit-learn (centralized) and PyTorch + NVIDIA FLARE (federated).",
+    "generated_at_utc": "2026-05-20T10:38:44Z"
+  },
+
+  "navigation": {
+    "description": "The app has four pages, reachable from the left sidebar. Brand shows 'Adherence AI · C09 Demo · v0.1'. A persistent red 'Demo only — Claims-based risk signal. Not clinically validated.' note sits at the bottom of the sidebar.",
+    "items": [
+      { "label": "Overview", "path": "/dashboard", "description": "Command-center dashboard: 6 headline metric cards, risk-group distribution bar chart, prediction performance + confusion matrix, model-comparison table, and the cohort/target definition with disclaimer.", "is_default": true },
+      { "label": "Patient Explorer", "path": "/explorer", "description": "Filterable, sortable table of a 1,000-row sample of test-set patients. Click a row to open a detailed patient card with risk score, observed PDC, 2015 adherence history, prescription features, diagnosis flags, and demographics." },
+      { "label": "FL Evidence", "path": "/evidence", "description": "Federated-learning evidence: headline centralized-vs-federated AUROC comparison, full model-comparison metrics table, per-client AUROC spread, FedAvg training configuration, 3-step architecture diagram, and simulation limitations." },
+      { "label": "Model Card", "path": "/model-card", "description": "Governance page: intended/prohibited uses, data and target definition, model architecture, feature groups, limitations, privacy design, validation status (engineering PASS / clinical NOT DONE / production NOT READY), and approved/forbidden wording." }
+    ],
+    "root_behavior": "Visiting '/' immediately redirects to '/dashboard'."
+  },
+
+  "risk_group_definitions": [
+    {
+      "id": "Low", "name": "Low Risk", "color_hex": "#34d399", "badge_tone": "success",
+      "predicted_risk_range": "predicted probability < 0.30",
+      "description": "Patients the model considers very likely to stay adherent in 2016. Largest group.",
+      "profile": "135,701 patients (43.5% of the test set). Average predicted risk 0.131; only 9.6% were actually non-adherent — the model rarely flags this group and is usually right. At the 0.50 decision threshold every Low patient is predicted adherent, so this group contains only true negatives (122,732) and false negatives (12,969, i.e. the 9.6% it missed).",
+      "interpretation": "Stable refill behaviour in 2015. A clinician/analyst would not prioritise this group for adherence support."
+    },
+    {
+      "id": "Medium", "name": "Medium Risk", "color_hex": "#f5b45c", "badge_tone": "warning",
+      "predicted_risk_range": "0.30 ≤ predicted probability < 0.60",
+      "description": "The uncertain middle band that straddles the 0.50 decision threshold. This is where most prediction errors concentrate.",
+      "profile": "58,827 patients (18.9%). Average predicted risk 0.433; 36.6% were actually non-adherent. Because the band crosses 0.50, it holds all four outcome types: 7,246 TP, 8,206 FP, 29,101 TN, 14,274 FN.",
+      "interpretation": "Mixed / borderline 2015 adherence signals. Predictions here are least confident; calibration matters most for this tier."
+    },
+    {
+      "id": "High", "name": "High Risk", "color_hex": "#f87171", "badge_tone": "danger",
+      "predicted_risk_range": "0.60 ≤ predicted probability < 0.80",
+      "description": "Patients the model flags as likely future non-adherers, but with less certainty than Very High.",
+      "profile": "32,725 patients (10.5%). Average predicted risk 0.707; 63.1% were actually non-adherent. At the 0.50 threshold every High patient is predicted non-adherent, so this group is all positives: 20,648 TP and 12,077 FP (no TN/FN).",
+      "interpretation": "Clear 2015 warning signs (gaps, low observed PDC). The model over-predicts slightly here (pred 0.71 vs observed 0.63)."
+    },
+    {
+      "id": "Very High", "name": "Very High Risk", "color_hex": "#ff2a2a", "badge_tone": "accent",
+      "predicted_risk_range": "predicted probability ≥ 0.80",
+      "description": "Patients the model is most confident will be non-adherent in 2016.",
+      "profile": "84,463 patients (27.1%). Average predicted risk 0.917; 89.2% were actually non-adherent — the highest hit rate of any tier. All predicted non-adherent at the 0.50 threshold: 75,345 TP and 9,118 FP (no TN/FN).",
+      "interpretation": "Strong, consistent 2015 non-adherence behaviour. This is the highest-priority group and the model is well-calibrated here (pred 0.92 vs observed 0.89)."
+    }
+  ],
+
+  "risk_group_statistics": {
+    "description": "Exact per-tier numbers behind the dashboard risk distribution chart and tooltip. Source: c09_risk_group_summary.csv. Shares sum to 100% and counts sum to 311,716 (the test set).",
+    "threshold_note": "Risk tiers are cut points on the predicted probability: Low <0.30, Medium 0.30–0.60, High 0.60–0.80, Very High ≥0.80. The model's binary decision threshold is separately fixed at 0.50, which is why Low/Medium/High/Very High do not map one-to-one onto predicted-adherent vs predicted-non-adherent.",
+    "groups": {
+      "Low":       { "patient_count": 135701, "patient_share": 0.4353, "average_predicted_risk": 0.1306, "observed_non_adherence_rate": 0.0956, "true_positive": 0,     "false_positive": 0,    "true_negative": 122732, "false_negative": 12969 },
+      "Medium":    { "patient_count": 58827,  "patient_share": 0.1887, "average_predicted_risk": 0.4329, "observed_non_adherence_rate": 0.3658, "true_positive": 7246,  "false_positive": 8206, "true_negative": 29101,  "false_negative": 14274 },
+      "High":      { "patient_count": 32725,  "patient_share": 0.1050, "average_predicted_risk": 0.7068, "observed_non_adherence_rate": 0.6310, "true_positive": 20648, "false_positive": 12077,"true_negative": 0,      "false_negative": 0 },
+      "Very High": { "patient_count": 84463,  "patient_share": 0.2710, "average_predicted_risk": 0.9167, "observed_non_adherence_rate": 0.8920, "true_positive": 75345, "false_positive": 9118, "true_negative": 0,      "false_negative": 0 }
+    },
+    "calibration_reading": "Predicted risk rises monotonically with observed non-adherence across tiers (0.13→0.43→0.71→0.92 predicted vs 0.10→0.37→0.63→0.89 observed). The model ranks patients correctly and slightly over-predicts risk in every tier (predicted a few points above observed), which is conservative/safe for a screening signal.",
+    "share_of_non_adherers": "Of all observed non-adherers, the Very High + High tiers capture the large majority, which is what makes the tiers useful for prioritisation even though no patient-level action is taken in this demo."
+  },
+
+  "model_performance": {
+    "description": "Headline metrics for the active model (centralized logistic baseline) on the 311,716-patient held-out test set, evaluated at decision threshold 0.50. These drive the six metric cards and the 'Prediction at Threshold 0.50' panel on the dashboard.",
+    "active_model": "centralized_logistic_baseline",
+    "test_set_size": 311716,
+    "test_set_construction": "15% stratified test split of 2,078,105 labelled patients (70/15/15 train/val/test, stratified by label_non_adherent, random_state=42).",
+    "average_predicted_risk": 0.4612,
+    "observed_non_adherence_rate": 0.4186,
+    "class_balance": "Test set: 130,482 non-adherent (41.9%) vs 181,234 adherent (58.1%).",
+    "metrics_at_0_5": {
+      "auroc": 0.8931, "auprc": 0.8600, "accuracy": 0.8180, "precision_ppv": 0.7781, "recall_sensitivity": 0.7909, "specificity": 0.8376, "f1": 0.7844, "balanced_accuracy": 0.8142, "brier_score": 0.1302, "threshold": 0.50
+    },
+    "confusion_matrix": {
+      "true_positive": 103239, "false_positive": 29401, "true_negative": 151833, "false_negative": 27243,
+      "prediction_correct_rate": 0.8183,
+      "reading": "TP = correctly flagged non-adherers; FP = adherent patients wrongly flagged; FN = non-adherers the model missed; TN = correctly cleared adherent patients. Accuracy 81.8% = (TP+TN)/total. Recall 79.1% = TP/(TP+FN). Precision 77.8% = TP/(TP+FP). Specificity 83.8% = TN/(TN+FP)."
+    },
+    "metric_meanings": {
+      "AUROC": "Probability the model ranks a random non-adherent patient above a random adherent one. 0.89 = strong discrimination (0.5 = random, 1.0 = perfect).",
+      "AUPRC": "Area under the precision-recall curve; more informative than AUROC under class imbalance. 0.86 vs a 0.42 baseline prevalence is well above chance.",
+      "Brier_score": "Mean squared error of the predicted probabilities; lower is better-calibrated. 0.13 is good for this kind of task.",
+      "Balanced_accuracy": "Average of recall and specificity; guards against being fooled by class imbalance.",
+      "F1": "Harmonic mean of precision and recall (0.78)."
+    },
+    "threshold_note": "Thresholds from 0.10 to 0.90 were analysed; 0.50 is used for the displayed confusion matrix. Lowering the threshold flags more patients (higher recall, lower precision); raising it does the opposite. The threshold analysis is descriptive only and does not define a deployment threshold."
+  },
+
+  "model_comparison": {
+    "description": "Three models evaluated on the same test set. Source: c09_model_comparison_summary.csv. Shown as a table on both the Overview and FL Evidence pages. The key message: federated training barely changes performance.",
+    "models": [
+      {
+        "model_name": "centralized_logistic_baseline", "display": "Centralized Baseline", "badge": "info",
+        "training_mode": "Centralized (scikit-learn, L2 logistic regression, saga solver)",
+        "auroc": 0.8931, "auprc": 0.8600, "accuracy": 0.8180, "precision": 0.7781, "recall": 0.7909, "specificity": 0.8376, "f1": 0.7844, "balanced_accuracy": 0.8142, "brier_score": 0.1302,
+        "notes": "Task 6 reference model. Trains on all data centrally. A max_iter convergence warning was recorded.",
+        "is_active_model": true
+      },
+      {
+        "model_name": "local_fedavg_pytorch", "display": "Local FedAvg (PyTorch)", "badge": "warning",
+        "training_mode": "Local federated simulation (PyTorch FedAvg, 20 clients, 20 rounds)",
+        "auroc": 0.8929, "auprc": 0.8601, "accuracy": 0.8177, "precision": 0.7774, "recall": 0.7910, "specificity": 0.8369, "f1": 0.7841, "balanced_accuracy": 0.8139, "brier_score": 0.1304,
+        "notes": "Task 8 in-process simulation of FedAvg. Not NVIDIA FLARE. Not deployment-ready."
+      },
+      {
+        "model_name": "nvflare_fedavg_pytorch", "display": "NVIDIA FLARE FedAvg", "badge": "success",
+        "training_mode": "NVIDIA FLARE simulator (FedAvg, 20 clients, 20 rounds)",
+        "auroc": 0.892, "auprc": 0.859, "accuracy": 0.818, "precision": 0.778, "recall": 0.79, "specificity": 0.836, "f1": 0.784, "balanced_accuracy": 0.813, "brier_score": 0.13,
+        "notes": "Task 10 FLARE simulator run. Metrics provided from the completed run; formal Task 10 validation files were not found."
+      }
+    ],
+    "headline": "NVIDIA FLARE FedAvg AUROC ≈ 0.892 vs centralized 0.893 — a drop of only ~0.2 × 10⁻³ (≈ 0.0002). Federated learning reaches essentially the same accuracy while raw patient data never leaves each client; only model weight updates are aggregated."
+  },
+
+  "federated_learning": {
+    "description": "How the federated simulation works and what it does (and does not) prove. Drives the FL Evidence page.",
+    "setup": {
+      "algorithm": "Synchronous FedAvg (sample-count weighted averaging of model parameters)",
+      "clients": 20,
+      "client_definition": "Regional clients derived from Hungarian county (megye) of 2015 C09 fills (megye_mode_2015). Synthetic labels client_01…; regions below 10,000 patients merged into client_other. Not real institutions.",
+      "rounds": 20,
+      "local_epochs_per_round": 1,
+      "batch_size": 4096,
+      "optimizer": "Adam (lr = 0.01, weight_decay = 0.0001)",
+      "loss": "BCEWithLogitsLoss with global pos_weight = 1.3890 (neg/pos ratio for class imbalance)",
+      "model_architecture": "Single linear layer (PyTorch logistic regression), mirroring the centralized baseline",
+      "device": "CPU"
+    },
+    "data_split": {
+      "train_rows": 1454673, "val_rows": 311716, "test_rows": 311716,
+      "train_prevalence": 0.4186, "val_prevalence": 0.4186, "test_prevalence": 0.4186,
+      "note": "All 20 clients had training rows. Preprocessing was fit centrally on global training rows for comparability — not fully privacy-preserving, a known simplification."
+    },
+    "per_client_results": {
+      "auroc_min": 0.8839, "auroc_median": 0.8935, "auroc_max": 0.9008, "auroc_spread": 0.0169,
+      "auprc_min": 0.8385, "auprc_median": 0.8550, "auprc_max": 0.8775,
+      "brier_min": 0.1241, "brier_median": 0.1281, "brier_max": 0.1376,
+      "largest_client_share": 0.1663, "min_client_size": 43901,
+      "reading": "All 20 regional clients scored AUROC > 0.88. The narrow 0.017 spread shows consistent quality despite non-IID regional differences, and no single client exceeded ~16.6% of patients, so FedAvg was not dominated by one site."
+    },
+    "architecture_steps": [
+      { "step": 1, "title": "Local Training", "desc": "Each of the 20 regional clients trains a logistic regression model on its own local patient rows. No raw patient data leaves the client." },
+      { "step": 2, "title": "Weight Aggregation", "desc": "The global server receives only model state dictionaries and patient counts, then computes a sample-count weighted average of the parameters." },
+      { "step": 3, "title": "Global Update", "desc": "The aggregated global model is broadcast back to all clients for the next round. After 20 rounds it reaches near-centralized AUROC." }
+    ],
+    "what_is_transmitted": "Only model weight tensors and client sample counts. No patient identifiers, raw prescriptions, or individual outcomes are shared.",
+    "what_it_does_not_prove": [
+      "It is a local simulation — all clients run in the same process on one machine.",
+      "Global preprocessing (imputation, scaling) was fit on centralized training data, not truly per-site.",
+      "No secure aggregation or differential privacy is used.",
+      "The NVIDIA FLARE run used the simulator, not a real multi-site deployment.",
+      "No fairness or subgroup analysis has been performed.",
+      "The model is not clinically validated and is not deployment-ready."
+    ]
+  },
+
+  "cohort_and_label": {
+    "description": "How the C09 cohort and the PDC non-adherence label were built. Useful for explaining the cohort/target panel and any 'what does non-adherent mean' question.",
+    "cohort_selection": "C09 (ATC level-3 antihypertensives) was chosen after feasibility (Task 2A) and data-quality (Task 2B) screening: ~153.6M C09 records, ~3.61M C09 patients, strong 2015 (~22.5M) and 2016 (~22.8M) coverage, and ~2.11M patients present in both years.",
+    "labelled_cohort_size": 2078105,
+    "inclusion": "Patient must have at least one valid C09 fill in BOTH 2015 (observation) and 2016 (prediction) windows, a valid TAJ identifier, a usable event date, positive DOT for PDC, and a computable PDC label. Patients with 2015 exposure but no 2016 fill are reported separately and excluded from this first label.",
+    "pdc_definition": "PDC = covered days inside the prediction window ÷ prediction-window days (366 in 2016). Each fill covers DOT days from its dispense date; intervals are clipped to the window; overlapping refills (stockpiling) are carried forward without double-counting; PDC is capped at 1.0.",
+    "adherence_threshold": "PDC ≥ 0.80 → adherent; PDC < 0.80 → non-adherent. label_non_adherent = 1 when PDC < 0.80.",
+    "deduplication": "Records deduplicated on TAJ + event date + normalized ATC + TTT; for same-day same-medication rows the maximum DOT is kept (not summed) to avoid inflating coverage. Addresses the ~6.76% duplicate-key risk found in Task 2B.",
+    "sanity_filter": "Patients with more than 5,000 C09 records across all years are excluded as likely placeholder/shared/malformed IDs (Task 2B found a per-patient max of ~1,129,114).",
+    "leakage_prevention": "Observation metrics use only 2015 data; the label uses only 2016 data; one row per patient; 2017 is not used at all.",
+    "dot_caveat": "DOT (days-of-therapy) is used as a days-supply proxy for PDC and requires clinical/domain validation. Dispensing is not the same as ingestion."
+  },
+
+  "dataset_features": {
+    "description": "What the model looks at. All 67 model features come ONLY from the 2015 observation window. Feature groups also power the per-patient card in the Explorer.",
+    "feature_count": 67,
+    "feature_window": "2015 only — no 2016 data enters model inputs. pdc_prediction and all prediction_* columns are explicitly excluded to prevent leakage.",
+    "feature_groups": [
+      { "group": "C09 adherence history", "prefix": "c09_2015_", "examples": "observed PDC, PDC<0.80 flag, record count, gap counts (≥30d, ≥60d), longest gap, days since last fill, Q4 fill flag", "why": "Prior-year refill regularity is the strongest predictor of next-year adherence." },
+      { "group": "All-medication burden", "prefix": "all_rx_2015_", "examples": "total Rx records, unique ATC level-3 groups, unique TTT substances, polypharmacy flags (≥5, ≥10 groups)", "why": "Captures overall treatment complexity and polypharmacy." },
+      { "group": "Cardiovascular context", "prefix": "cv_2015_", "examples": "CV (ATC C) record count, C09 share of CV records, C09 share of all records", "why": "Places C09 use in the patient's cardiovascular treatment context." },
+      { "group": "Diagnosis flags", "prefix": "dx_2015_has_", "examples": "circulatory (I), endocrine (E), genitourinary (N), respiratory (J) ICD-10 chapter indicators", "why": "Simple comorbidity context from 2015 diagnosis codes." },
+      { "group": "Demographics / geography", "prefix": "age_at_2015, age_group_2015, megye_mode_2015", "examples": "age, age group, most-frequent county", "why": "Demographic context; county also defines the FL client split. Exact birth date is never retained." }
+    ],
+    "preprocessing": "Numeric: median imputation + standard scaling. Categorical (age_group, megye): most-frequent imputation + one-hot encoding; unknown levels ignored at inference.",
+    "explorer_columns_shown": ["demo_patient_id", "predicted_risk", "risk_group", "actual_outcome_text", "actual_pdc", "age_group_2015", "megye_mode_2015", "prediction_correct", "prediction_error_type"],
+    "sensitive_columns_excluded": ["TAJ", "TAJ_NORM", "real patient_id", "ORVOSKOD (provider)", "VENYAZ (prescription id)", "all raw fill dates"]
+  },
+
+  "page_visuals": {
+    "description": "Chart-by-chart and panel-by-panel explanations so the assistant can describe exactly what a user is looking at on each page, what the numbers mean, and how to read them.",
+
+    "dashboard": {
+      "route": "/dashboard",
+      "metric_cards": [
+        { "title": "Test-set patients", "value": "311,716", "meaning": "Size of the held-out 15% stratified test split used for every number on this page." },
+        { "title": "Avg predicted risk", "value": "0.461", "meaning": "Mean predicted probability of 2016 non-adherence across the test set. Close to the observed rate (0.419), a sign of reasonable calibration." },
+        { "title": "Observed non-adherence", "value": "41.9%", "meaning": "Share of test patients who were actually non-adherent (PDC < 0.80) in 2016 — the ground-truth base rate." },
+        { "title": "AUROC", "value": "0.8931", "meaning": "Ranking/discrimination quality of the centralized baseline (0.5 random, 1.0 perfect)." },
+        { "title": "AUPRC", "value": "0.8600", "meaning": "Precision-recall area; strong given the 41.9% prevalence." },
+        { "title": "Brier Score", "value": "0.1302", "meaning": "Calibration error of predicted probabilities; lower is better." }
+      ],
+      "risk_bar_chart": {
+        "title": "Risk Group Distribution",
+        "type": "vertical bar chart (Recharts), one bar per tier, ordered Low → Medium → High → Very High, colours green/amber/red/bright-red",
+        "y_axis": "patient_count (labels abbreviated as k, e.g. 136k)",
+        "bars": "Low 135,701 · Medium 58,827 · High 32,725 · Very High 84,463",
+        "tooltip": "Hovering a bar shows patient count, share %, average predicted risk, and observed non-adherence rate for that tier.",
+        "how_to_read": "Bar height = how many test patients fall in each predicted-risk tier. Low is the tallest (43.5%); Very High is the second tallest (27.1%). The companion 2×2 grid under the chart repeats counts and shares as text."
+      },
+      "prediction_performance_panel": {
+        "title": "Prediction at Threshold 0.50",
+        "rows": "Accuracy 81.8% · Precision (PPV) 77.8% · Recall 79.1% · Specificity 83.8% · F1 0.7844 · Balanced Accuracy 81.4% (highlighted) · Brier 0.1302",
+        "confusion_matrix_tiles": "TP 103,239 (green) · FP 29,401 (amber) · FN 27,243 (red) · TN 151,833 (blue)",
+        "correct_rate": "Prediction correct rate 81.8% = (TP+TN)/total."
+      },
+      "model_comparison_table": {
+        "title": "Model Comparison — Test Set",
+        "columns": ["Model", "Training Mode", "AUROC", "AUPRC", "Accuracy", "Precision", "Recall", "F1", "Brier"],
+        "rows": "Centralized Baseline, Local FedAvg (PyTorch), NVIDIA FLARE FedAvg — see model_comparison section for exact values.",
+        "takeaway": "All three rows are nearly identical, illustrating that federated training costs almost no accuracy."
+      },
+      "cohort_panel": {
+        "title": "Dataset & Target Definition",
+        "fields": "Medication Group = C09 Antihypertensives · Observation Window = 2015 · Prediction Window = 2016 · Non-adherence = PDC < 0.80",
+        "disclaimer": "Red box: claims-based adherence risk signal only; not a clinical diagnosis or deployment-ready system; PDC computed from DOT proxy and requires clinical validation."
+      }
+    },
+
+    "explorer": {
+      "route": "/explorer",
+      "sample_note": "The table shows a 1,000-row sample; the full test dataset is 311,716 patients. Filters/sorting apply to the sample.",
+      "filters": ["Risk Tier", "Outcome (Adherent / Non-adherent)", "Prediction (TP/FP/TN/FN)", "Age Group", "FL Client"],
+      "table_columns": ["Patient ID (DEMO-XXXXXX)", "Risk Score (predicted % )", "Risk Tier", "Observed (Adherent/Non-adherent)", "Obs. PDC", "Result (TP/FP/TN/FN badge)"],
+      "sort": "Click any column header to sort; default sort is predicted_risk descending.",
+      "patient_card": {
+        "header": "Demo patient ID + a TP/FP/TN/FN result badge.",
+        "risk_bar": "Predicted non-adherence risk as a coloured % bar with the tier badge.",
+        "observed_outcome": "2016 observed PDC value and an Adherent/Non-adherent badge.",
+        "adherence_history_2015": "Observed PDC 2015, PDC<0.80 flag, C09 record count, gaps ≥30d and ≥60d, longest gap, days since last fill, Q4 2015 fill flag.",
+        "prescription_features_2015": "All-Rx record count, unique ATC L3 groups, polypharmacy ≥5 and ≥10 flags, CV record count, C09 share of CV records.",
+        "diagnosis_flags_2015": "Circulatory (I), Endocrine (E), Genitourinary (N), Respiratory (J) yes/no.",
+        "demographics": "Age group, county (megye), age at 2015, FL client id."
+      },
+      "how_to_read": "Each row is one test-set patient. Compare the predicted Risk Score / tier against the Observed outcome and PDC to see whether the model was right (Result badge). Use the patient card to see the 2015 evidence behind the score."
+    },
+
+    "evidence": {
+      "route": "/evidence",
+      "headline_panel": {
+        "title": "Near-Centralized Performance via Federated Learning",
+        "mini_stats": "Centralized AUROC 0.8931 · Local FL AUROC 0.8929 · NVFLARE AUROC 0.8920 · FL Clients 20",
+        "message": "Federated AUROC ≈ centralized AUROC; drop ≈ 0.21 × 10⁻³. Raw data stays on each client."
+      },
+      "full_metrics_table": "Same three models as the dashboard but with all nine metric columns (adds Specificity and Balanced Accuracy). AUROC cells are colour-coded by model.",
+      "per_client_panel": {
+        "title": "Per-Client AUROC (Local FL)",
+        "stats": "Min 0.8839 · Median 0.8935 · Max 0.9008",
+        "message": "All 20 regional clients scored AUROC > 0.88; the 0.017 spread shows consistency despite regional heterogeneity."
+      },
+      "fedavg_config_panel": {
+        "title": "FedAvg Setup",
+        "rows": "Algorithm Synchronous FedAvg · 20 regional clients · 20 rounds · 1 local epoch/round · batch 4,096 · Adam lr=0.01 · sample-count weighted aggregation · single linear layer · Hungarian megye client split."
+      },
+      "architecture_panel": "3 numbered steps: Local Training → Weight Aggregation → Global Update, plus a privacy-design note that only weight tensors and sample counts are transmitted.",
+      "limitations_panel": "Grid of 6 caveats — see federated_learning.what_it_does_not_prove."
+    },
+
+    "model_card": {
+      "route": "/model-card",
+      "sections": ["Intended Use (approved vs prohibited)", "Data Source and Target Definition", "Model Architecture and Training", "Feature Group Summary", "Known Limitations", "Privacy Design", "Validation Status", "Approved and Forbidden Wording"],
+      "validation_status": { "internal_engineering": "PASS — all critical checks passed in Tasks 4–10", "clinical_validation": "NOT DONE — never reviewed by clinicians", "production_readiness": "NOT READY — no secure FL, RBAC, or audit logging" },
+      "model_facts": "L2 logistic regression (saga); 67 features (65 numeric, 2 categorical); 2015-only features; 1,454,673 / 311,716 / 311,716 split; class_weight='balanced'; max_iter convergence warning recorded."
+    }
+  },
+
+  "key_statistics": {
+    "total_labelled_cohort": 2078105,
+    "test_set_patients": 311716,
+    "observed_non_adherence_rate_test": "41.9% (130,482 non-adherent / 181,234 adherent)",
+    "average_predicted_risk": 0.4612,
+    "centralized_auroc": 0.8931,
+    "federated_auroc_drop_vs_centralized": "≈ 0.0002 (0.21 × 10⁻³)",
+    "risk_tier_shares": { "Low": "43.5%", "Medium": "18.9%", "High": "10.5%", "Very High": "27.1%" },
+    "risk_tier_observed_non_adherence": { "Low": "9.6%", "Medium": "36.6%", "High": "63.1%", "Very High": "89.2%" },
+    "confusion_matrix": { "TP": 103239, "FP": 29401, "TN": 151833, "FN": 27243 },
+    "fl_clients": 20,
+    "fl_rounds": 20,
+    "feature_count": 67
+  },
+
+  "privacy_and_governance": {
+    "patient_identifier_policy": "App-facing files use demo-safe IDs only (DEMO-XXXXXX). No TAJ, TAJ_NORM, or real identifiers in data/app/.",
+    "privacy_notes": [
+      "App-facing files contain demo-safe IDs only.",
+      "Prediction scores derive from 2015 observation-window features; labels from 2016 outcomes.",
+      "Data was generated in a centralized development environment.",
+      "Federated learning reduces raw data movement but does not eliminate all privacy risk; model updates can leak information without additional protection."
+    ],
+    "deployment_gaps": "No secure aggregation, no differential privacy, no RBAC, no audit logging, no real multi-site provisioning."
+  },
+
+  "limitations": [
+    "Claims-based adherence risk signal, not a clinical diagnosis.",
+    "PDC is a pragmatic proxy for adherence; DOT is a days-supply proxy that requires clinical validation.",
+    "Not clinically validated and not deployment-ready.",
+    "Covers one medication cohort (C09 antihypertensives) and one 2015→2016 observation/prediction pair only.",
+    "A max_iter convergence warning was recorded during baseline training.",
+    "Federated results come from a simulator, not a real multi-site deployment; no secure aggregation or differential privacy.",
+    "Dispensing is not ingestion; a missing refill can reflect discontinuation, switching, death, migration, or a data gap — not necessarily non-adherence."
+  ],
+
+  "language_policy": {
+    "use_these_terms": ["predicted non-adherence risk", "claims-based adherence risk signal", "observed test-set outcome", "PDC-based label", "predicted probability of future non-adherence", "adherence risk score"],
+    "never_use_these_terms": ["non-compliant patient", "patient will not take medication", "clinical recommendation", "diagnosis", "deployment-ready clinical decision system", "this patient should receive an intervention"],
+    "tone": "Always frame outputs as a non-clinical, claims-based analytical signal. Never imply clinical judgement, treatment advice, or patient-specific action."
+  },
+
+  "glossary": {
+    "C09": "ATC level-3 medication class for antihypertensives (ACE inhibitors, ARBs and related agents) — the cohort this app studies.",
+    "PDC": "Proportion of Days Covered — covered days divided by window days. The adherence measure; PDC < 0.80 = non-adherent.",
+    "DOT": "Days of Therapy — used as a days-supply proxy to compute PDC. Requires clinical validation.",
+    "non_adherence": "Analytical label: 2016 PDC below 0.80. A risk signal from dispensing data, not a clinical or behavioural judgement.",
+    "observation_window": "2015 — the period model features are computed from.",
+    "prediction_window": "2016 — the period the outcome/label is measured in (366 days).",
+    "risk_group": "Predicted-probability tier: Low <0.30, Medium 0.30–0.60, High 0.60–0.80, Very High ≥0.80.",
+    "predicted_risk": "Model's estimated probability (0–1) that a patient will be non-adherent in 2016.",
+    "AUROC": "Area under the ROC curve; discrimination quality (0.5 random, 1.0 perfect).",
+    "AUPRC": "Area under the precision-recall curve; informative under class imbalance.",
+    "Brier_score": "Mean squared error of predicted probabilities; calibration quality (lower = better).",
+    "precision_PPV": "TP / (TP + FP) — share of flagged patients who really were non-adherent.",
+    "recall_sensitivity": "TP / (TP + FN) — share of actual non-adherers the model caught.",
+    "specificity": "TN / (TN + FP) — share of adherent patients correctly cleared.",
+    "confusion_matrix": "2×2 grid of TP/FP/FN/TN at the 0.50 decision threshold.",
+    "TP_FP_TN_FN": "True/False Positive/Negative — correct/incorrect flags vs the observed outcome.",
+    "federated_learning": "Training across multiple clients where each keeps its raw data local and shares only model updates.",
+    "FedAvg": "Federated Averaging — the server averages client model weights, weighted by each client's sample count.",
+    "client_megye": "A federated client defined by Hungarian county (megye) of 2015 C09 fills; a simulation label, not a real institution.",
+    "NVIDIA_FLARE": "Open-source federated-learning framework used for the simulator run of the federated model.",
+    "polypharmacy": "Concurrent use of many medications; flagged at ≥5 and ≥10 unique ATC level-3 groups.",
+    "TAJ": "Hungarian patient identifier — internal only, never present in app-facing files.",
+    "threshold": "Probability cut-off (0.50) that converts a predicted risk into a yes/no non-adherence prediction."
+  }
+  },
+  "disease_prediction":{
+  "app": {
+    "name": "SPICY CareRisk",
+    "alt_names": ["HELIX CareRisk"],
+    "subtitle": "Population diabetes-onset risk dashboard",
+    "use_case": "UC1 · Broad Diabetes Onset Prediction",
+    "description": "A privacy-preserving population health dashboard that scores a whole patient cohort for risk of broad diabetes onset within a 12-month horizon. A calibrated centralized LightGBM model assigns every patient a calibrated onset-risk score; the dashboard turns those scores into risk bands, top-k intervention plans, threshold scenarios, and population analytics so prevention teams can plan capacity. It also carries proof-of-concept federated-learning evidence showing a 4-client collaborative model reaches comparable ranking quality without pooling raw patient data.",
+    "purpose": "Help non-technical reviewers and population-health teams understand (1) how the population splits into calibrated diabetes-risk bands, (2) how many patients and confirmed cases fall into each band or top-k group, (3) what outreach workload each prioritisation choice implies, and (4) the strict limits of an administrative-claims, non-clinical risk signal.",
+    "intended_use": "Aggregate population planning, prioritisation, stakeholder reporting, and model-readiness review only. NOT a clinical decision-support tool, NOT clinically validated, NOT deployment-ready for individual patient decisions.",
+    "disease_studied": "Broad diabetes onset, defined as an ICD-10/BNO diagnosis in groups E10, E11, E12, E13, E14.",
+    "data_source": "Hungarian national administrative/claims data: VENY prescription dispensing, JARO outpatient contacts, and diagnosis (BNO/ICD-10) events. All dashboard outputs are aggregate; patient-level scores (with TAJ identifiers) live only in a private/internal directory.",
+    "observation_setup": "Features are computed from a patient's prior observation window (e.g. the 2013-01-01 to 2014-12-31 window for the 2015 prediction year). The product scoring run covers 5,840,319 patients in the observation population.",
+    "prediction_setup": "Predict whether broad diabetes onset is recorded in the following 12-month label window (e.g. 2015-01-01 to 2015-12-31 for the production scoring population).",
+    "target_definition": "Binary label diabetes_onset = 1 if at least one broad-diabetes (E10-E14) diagnosis event is recorded in the 12-month prediction window, else 0. Labels are administrative, not clinically confirmed.",
+    "scoring_model": "enhanced_clinical_lightgbm_sigmoid_calibrated (LightGBM + sigmoid/Platt calibration), version v1, scored 2026-05-25.",
+    "technology": "Vite + React + TypeScript single-page app. Charts via Recharts; routing via react-router; styling via Tailwind CSS with lucide-react icons. The frontend reads prepared aggregate CSV/JSON files from dashboard_data/ at build time (no live backend in this build).",
+    "branding_note": "The sidebar title comes from project_summary.json.product_name = 'SPICY CareRisk'. The Overview page header shows a 'HELIX CareRisk' badge and 'Population Risk Dashboard' title. Both names refer to the same product; HELIX/SPICY CareRisk are used interchangeably.",
+    "disclaimers": [
+      "Aggregate dashboard only — no patient identifiers are present.",
+      "For planning use only — not for direct clinical action.",
+      "Observed positives are administrative-claims labels (diagnosis events), not clinical confirmation.",
+      "The calibrated centralized model is used for risk scoring; the federated model is a proof-of-concept and is not used for scoring because its probabilities are not yet calibrated."
+    ]
+  },
+
+  "navigation": {
+    "description": "The routed app has five pages reachable from the left sidebar. The sidebar footer reads 'Aggregate dashboard — no patient identifiers. For planning use only.' Any unknown path redirects to Overview.",
+    "default_route": "'/' renders the Overview (HomePage) as the index route. Unmatched routes ('*') redirect to '/'.",
+    "items": [
+      { "label": "Overview", "path": "/", "icon": "LayoutDashboard", "description": "Population snapshot and key risk metrics — KPI cards, the risk-band population split bar, a 'where to focus' spotlight, recommended actions by band, and model/data info cards.", "is_default": true },
+      { "label": "Patient Explorer", "path": "/patients", "icon": "Users", "description": "Risk bands, a per-band enrichment chart and summary table, and a 200-patient anonymised demo lookup with full per-patient risk profiles and recommended actions." },
+      { "label": "Intervention Planner", "path": "/intervention", "icon": "Target", "description": "Capacity-based prioritisation: a capacity calculator, a top-k group planner, and a probability-threshold planner, each with workload and case-capture estimates." },
+      { "label": "Population Analytics", "path": "/analytics", "icon": "BarChart3", "description": "Cumulative case-capture (lift) curve, percentile explorer, population/enrichment/case-capture charts, comorbidity and demographics profiles by band, calibration check, score distribution, and top risk drivers." },
+      { "label": "Governance", "path": "/governance", "icon": "Shield", "description": "Appropriate vs inappropriate uses, required steps before clinical deployment, known model/data limitations, and scoring-run notes." }
+    ]
+  },
+
+  "risk_band_definitions": [
+    {
+      "id": "very_low", "name": "Very Low", "color_hex": "#34d399", "badge_tone": "success",
+      "percentile_range": "0th-50th percentile of predicted risk",
+      "description": "Bottom half of the population by calibrated onset risk. The largest band.",
+      "profile": "2,920,160 patients (50.0% of the 5,840,319 cohort). Mean calibrated risk 0.37%; observed onset rate just 0.016% (472 confirmed cases). Captures only 2.5% of all confirmed cases. Enrichment 0.05x — far below population average.",
+      "clinical_interpretation": "Standard care — no additional screening required. Continue routine annual health check; reassess at next review.",
+      "recommended_action_summary": "Standard care — no additional screening required."
+    },
+    {
+      "id": "low", "name": "Low", "color_hex": "#84cc16", "badge_tone": "success",
+      "percentile_range": ">50th-80th percentile",
+      "description": "Above median but below the 80th percentile of predicted risk.",
+      "profile": "1,752,095 patients (30.0%). Mean calibrated risk 1.54%; observed onset rate 0.199% (3,484 cases). Captures 18.5% of all confirmed cases. Enrichment 0.62x.",
+      "clinical_interpretation": "Lifestyle monitoring — flag for health promotion. Lifestyle counselling, annual metabolic review.",
+      "recommended_action_summary": "Lifestyle monitoring — flag for health promotion."
+    },
+    {
+      "id": "moderate", "name": "Moderate", "color_hex": "#f5b45c", "badge_tone": "warning",
+      "percentile_range": ">80th-90th percentile",
+      "description": "Elevated risk — 80th to 90th percentile.",
+      "profile": "584,032 patients (10.0%). Mean calibrated risk 4.25%; observed onset rate 0.516% (3,013 cases). Captures 16.0% of all confirmed cases. Enrichment 1.60x — first band above population average.",
+      "clinical_interpretation": "Enhanced monitoring — consider HbA1c screening within 6 months, structured lifestyle intervention, medication review.",
+      "recommended_action_summary": "Enhanced monitoring — consider HbA1c screening."
+    },
+    {
+      "id": "high", "name": "High", "color_hex": "#f97316", "badge_tone": "danger",
+      "percentile_range": ">90th-95th percentile",
+      "description": "High risk — 90th to 95th percentile.",
+      "profile": "292,016 patients (5.0%). Mean calibrated risk 6.13%; observed onset rate 1.058% (3,089 cases). Captures 16.4% of all confirmed cases. Enrichment 3.28x.",
+      "clinical_interpretation": "Priority outreach — preventive consultation within 3 months, comprehensive cardiovascular/metabolic risk assessment, consider diabetes prevention programme.",
+      "recommended_action_summary": "Priority outreach — schedule preventive consultation."
+    },
+    {
+      "id": "very_high", "name": "Very High", "color_hex": "#f87171", "badge_tone": "danger",
+      "percentile_range": ">95th-100th percentile (top 5%)",
+      "description": "Highest-risk 5% of the population.",
+      "profile": "292,016 patients (5.0%). Mean calibrated risk 8.53% (max calibrated risk in the whole cohort is 17.02%, all in this band); observed onset rate 3.003% (8,769 cases). Captures 46.6% of ALL confirmed cases — nearly half — from just 5% of patients. Enrichment 9.32x, the highest of any band.",
+      "clinical_interpretation": "Urgent clinical review — initiate outreach within 30 days, comprehensive metabolic assessment (HbA1c, fasting glucose, lipids), multidisciplinary risk management, enrolment in intensive prevention.",
+      "recommended_action_summary": "Urgent clinical review — contact within 30 days."
+    }
+  ],
+
+  "risk_band_statistics": {
+    "description": "Exact per-band numbers behind the Overview population split, the Patient Explorer band table/chart, and the Analytics band charts. Source: risk_band_summary.json. Patient counts sum to 5,840,319; observed positives sum to 18,827.",
+    "band_note": "Bands are percentile cut-points on the calibrated risk score: very_low 0-50, low 50-80, moderate 80-90, high 90-95, very_high 95-100. There is no single 0.50 decision threshold — the outcome is rare (0.32% prevalence) and the model's maximum calibrated score is only ~17%.",
+    "bands": {
+      "very_low":  { "patient_count": 2920160, "patient_percent": 50.0, "observed_positive_count": 472,  "observed_positive_rate": 0.000162, "captured_positive_percent": 2.507,  "risk_enrichment_vs_population": 0.0501, "mean_calibrated_risk": 0.003691, "median_calibrated_risk": 0.003319, "min_calibrated_risk": 0.002999, "max_calibrated_risk": 0.005955 },
+      "low":       { "patient_count": 1752095, "patient_percent": 30.0, "observed_positive_count": 3484, "observed_positive_rate": 0.001988, "captured_positive_percent": 18.5053, "risk_enrichment_vs_population": 0.6168, "mean_calibrated_risk": 0.015379, "median_calibrated_risk": 0.013163, "min_calibrated_risk": 0.005955, "max_calibrated_risk": 0.032797 },
+      "moderate":  { "patient_count": 584032,  "patient_percent": 10.0, "observed_positive_count": 3013, "observed_positive_rate": 0.005159, "captured_positive_percent": 16.0036, "risk_enrichment_vs_population": 1.6004, "mean_calibrated_risk": 0.042451, "median_calibrated_risk": 0.042050, "min_calibrated_risk": 0.032797, "max_calibrated_risk": 0.053875 },
+      "high":      { "patient_count": 292016,  "patient_percent": 5.0,  "observed_positive_count": 3089, "observed_positive_rate": 0.010578, "captured_positive_percent": 16.4073, "risk_enrichment_vs_population": 3.2815, "mean_calibrated_risk": 0.061262, "median_calibrated_risk": 0.060969, "min_calibrated_risk": 0.053875, "max_calibrated_risk": 0.069786 },
+      "very_high": { "patient_count": 292016,  "patient_percent": 5.0,  "observed_positive_count": 8769, "observed_positive_rate": 0.030029, "captured_positive_percent": 46.5767, "risk_enrichment_vs_population": 9.3153, "mean_calibrated_risk": 0.085252, "median_calibrated_risk": 0.082148, "min_calibrated_risk": 0.069786, "max_calibrated_risk": 0.170250 }
+    },
+    "ranking_reading": "Both mean predicted risk and observed onset rate rise monotonically across bands (predicted 0.37%->1.54%->4.25%->6.13%->8.53%; observed 0.016%->0.199%->0.516%->1.058%->3.003%), so the model ranks patients in the correct order. Enrichment climbs from 0.05x to 9.32x. The top 5% (very_high) captures 46.6% of all confirmed cases; the top 10% (very_high + high) captures 62.99%.",
+    "calibration_caveat": "The Analytics 'Calibration quality by band' table compares mean predicted risk to observed band rate. Because onset is a rare administrative-label event, observed band rates are much lower than mean predicted risk, so the per-band ratio (predicted/observed) is well above 1 in EVERY band (very_low ~22.8x, low ~7.7x, moderate ~8.2x, high ~5.8x, very_high ~2.8x) and the on-screen assessment reads 'Over-predicts' for all five bands. This is flagged honestly in the UI and means band-level calibration on the deployment population still needs verification before clinical use."
+  },
+
+  "calibration_quality_by_band": {
+    "description": "Drives the Analytics 'Calibration quality by band' table. ratio = mean_calibrated_risk / observed_positive_rate. Assessment label: <0.7 Under-predicts, 0.7-1.4 Well calibrated (with 0.85-1.15 'Well calibrated' and 0.7-0.85 or 1.15-1.4 'Slight drift'), >1.4 Over-predicts.",
+    "rows": {
+      "very_low":  { "mean_predicted_pct": 0.37, "observed_pct": 0.02, "ratio": 22.79, "assessment": "Over-predicts" },
+      "low":       { "mean_predicted_pct": 1.54, "observed_pct": 0.20, "ratio": 7.74,  "assessment": "Over-predicts" },
+      "moderate":  { "mean_predicted_pct": 4.25, "observed_pct": 0.52, "ratio": 8.23,  "assessment": "Over-predicts" },
+      "high":      { "mean_predicted_pct": 6.13, "observed_pct": 1.06, "ratio": 5.79,  "assessment": "Over-predicts" },
+      "very_high": { "mean_predicted_pct": 8.53, "observed_pct": 3.00, "ratio": 2.84,  "assessment": "Over-predicts" }
+    },
+    "footnote": "Calibration verification on the target deployment population is required before clinical use. These figures are from the training/scoring population only."
+  },
+
+  "model_performance": {
+    "description": "The product risk scores come from the calibrated centralized model enhanced_clinical_lightgbm + sigmoid (Platt) calibration, v1. Because the outcome is rare (~0.32% prevalence) there is no useful single 0.50 decision threshold — the calibrated model's max score is ~17%, so at 0.50 it predicts zero positives. Performance is therefore read via AUROC/AUPRC, calibration (Brier/log-loss), and the threshold/top-k tradeoff tables, not a fixed-threshold confusion matrix.",
+    "active_model": "enhanced_clinical_sigmoid_calibrated",
+    "scoring_population": 5840319,
+    "overall_positive_rate": 0.003224,
+    "headline_metrics": {
+      "auroc": 0.8142, "auprc": 0.0647, "brier_score": 0.0177, "log_loss": 0.0802,
+      "note": "AUROC ~0.814 (ranking quality). AUPRC ~0.065 looks low but the baseline prevalence is only ~0.0032, so AUPRC is ~20x the no-skill baseline. Sigmoid calibration cuts the Brier score from ~0.138 (uncalibrated) to 0.0177."
+    },
+    "confusion_matrix_by_threshold": {
+      "description": "From threshold_analysis_summary.csv, evaluated on a sampled test set with 200,000 negatives (capped) and 3,766 positives (203,766 rows total). There is no single deployment threshold; the table shows the precision/recall tradeoff. Note threshold 0.5 yields zero predicted positives for the calibrated rare-event model.",
+      "rows": [
+        { "threshold": 0.005, "true_positives": 3629, "false_positives": 109443, "true_negatives": 90557,  "false_negatives": 137,  "precision": 0.0321, "recall": 0.9636, "specificity": 0.4528, "f1": 0.0621 },
+        { "threshold": 0.01,  "true_positives": 3362, "false_positives": 79533,  "true_negatives": 120467, "false_negatives": 404,  "precision": 0.0406, "recall": 0.8927, "specificity": 0.6023, "f1": 0.0776 },
+        { "threshold": 0.02,  "true_positives": 2871, "false_positives": 56341,  "true_negatives": 143659, "false_negatives": 895,  "precision": 0.0485, "recall": 0.7623, "specificity": 0.7183, "f1": 0.0912 },
+        { "threshold": 0.05,  "true_positives": 1574, "false_positives": 22824,  "true_negatives": 177176, "false_negatives": 2192, "precision": 0.0645, "recall": 0.4180, "specificity": 0.8859, "f1": 0.1118 },
+        { "threshold": 0.1,   "true_positives": 161,  "false_positives": 1294,   "true_negatives": 198706, "false_negatives": 3605, "precision": 0.1107, "recall": 0.0428, "specificity": 0.9935, "f1": 0.0617 },
+        { "threshold": 0.2,   "true_positives": 0,    "false_positives": 0,      "true_negatives": 200000, "false_negatives": 3766, "precision": 0.0,    "recall": 0.0,    "specificity": 1.0,    "f1": 0.0 },
+        { "threshold": 0.5,   "true_positives": 0,    "false_positives": 0,      "true_negatives": 200000, "false_negatives": 3766, "precision": 0.0,    "recall": 0.0,    "specificity": 1.0,    "f1": 0.0 }
+      ],
+      "reading": "TP = confirmed onsets correctly flagged; FP = patients flagged who had no recorded onset; FN = onsets the model missed at that threshold; TN = correctly cleared. As the threshold rises, recall falls and precision rises. Because onset is rare, precision stays low everywhere — every prioritisation choice trades many false positives for each true case found. The note in the file states explicitly: 'Threshold 0.5 is not operationally useful for calibrated rare-event probabilities.'"
+    },
+    "metric_meanings": {
+      "AUROC": "Probability the model ranks a random future-onset patient above a random non-onset patient. ~0.81 = good discrimination (0.5 random, 1.0 perfect).",
+      "AUPRC": "Area under the precision-recall curve; the right summary under heavy class imbalance. ~0.065 vs a ~0.0032 baseline prevalence is roughly 20x chance.",
+      "Brier_score": "Mean squared error of the predicted probabilities; lower = better calibrated. Sigmoid calibration brings it to 0.0177.",
+      "precision_ppv": "TP/(TP+FP) — share of flagged patients who actually had a recorded onset. Low here by nature of a rare event.",
+      "recall_sensitivity": "TP/(TP+FN) — share of all actual onsets the selection captures.",
+      "specificity": "TN/(TN+FP) — share of non-onset patients correctly left out.",
+      "f1": "Harmonic mean of precision and recall.",
+      "balanced_accuracy": "Average of recall and specificity; guards against being fooled by the 99.7% negative class.",
+      "number_needed_to_review": "How many patients you must contact to find one confirmed case (1/precision) — the operational efficiency metric the planner pages lead with."
+    },
+    "rare_event_warning": "Accuracy and a 0.50 threshold are misleading for this task (you could score ~99.7% accuracy by predicting 'no onset' for everyone). The product deliberately leads with recall, case-capture %, enrichment, and number-needed-to-review instead."
+  },
+
+  "model_comparison": {
+    "description": "Three models from centralized_vs_federated_metrics.csv / model_registry.json. The architectures are NOT identical (LightGBM vs PyTorch MLP), so the comparison is directional only. The calibrated LightGBM is the product scoring model.",
+    "comparison_note": "Centralized and collaborative models are not architecture-identical; compare directionally.",
+    "models": [
+      {
+        "model_id": "enhanced_clinical_lightgbm", "display": "Enhanced clinical LightGBM (uncalibrated)",
+        "training_mode": "centralized", "model_type": "LightGBM", "calibration_status": "uncalibrated",
+        "auroc": 0.8188, "auprc": 0.0663, "brier": 0.1480, "precision_at_0_5": 0.0501, "recall_at_0_5": 0.7400, "specificity_at_0_5": 0.7362, "f1_at_0_5": 0.0939,
+        "product_role": "Benchmark candidate excluding geography predictors.",
+        "notes": "Best raw discriminator, but uncalibrated probabilities (Brier 0.148)."
+      },
+      {
+        "model_id": "enhanced_clinical_sigmoid_calibrated", "display": "Enhanced clinical LightGBM + sigmoid calibration",
+        "training_mode": "centralized", "model_type": "LightGBM + sigmoid calibration", "calibration_status": "calibrated",
+        "auroc": 0.8142, "auprc": 0.0647, "brier": 0.0177, "precision_at_0_5": 0.0, "recall_at_0_5": 0.0, "specificity_at_0_5": 1.0, "f1_at_0_5": 0.0,
+        "product_role": "Recommended centralized candidate for calibrated risk communication — THIS is the product scoring model.",
+        "notes": "Sigmoid (Platt) calibration trades a hair of AUROC for a far better Brier (0.0177). precision/recall at 0.5 are 0 because calibrated scores never reach 0.5 (rare event).",
+        "is_active_model": true
+      },
+      {
+        "model_id": "federated_random_4_client_mlp", "display": "Random 4-client collaborative MLP",
+        "training_mode": "collaborative training (federated)", "model_type": "PyTorch MLP", "calibration_status": "not_calibrated",
+        "auroc": 0.8251, "auprc": 0.0130, "brier": 0.1839, "precision_at_0_5": 0.0081, "recall_at_0_5": 0.8528, "specificity_at_0_5": 0.6623, "f1_at_0_5": 0.0160,
+        "product_role": "Proof-of-concept privacy-preserving collaboration evidence.",
+        "notes": "Highest AUROC (0.8251) but uncalibrated (Brier 0.184) and a different architecture; not used for product scoring until calibrated."
+      }
+    ],
+    "headline": "The federated 4-client MLP reaches AUROC ~0.825, comparable to the centralized LightGBM (~0.814-0.819), without pooling raw patient data — evidence that collaborative training is feasible. But it is uncalibrated and architecturally different, so the calibrated centralized LightGBM remains the scoring model."
+  },
+
+  "federated_learning": {
+    "description": "Proof-of-concept collaborative training. Evidence files: fl_client_summary.csv (per-site) and fl_training_rounds.csv (per-round). Not rendered on the five routed pages of this build, but part of the project evidence and product story.",
+    "setup": {
+      "algorithm": "Local FedAvg-style simulation (weighted averaging of model parameters)",
+      "clients": 4,
+      "client_definition": "Site 1-4 = client_1..client_4, each a SYNTHETIC RANDOM client (IID-style split), not a real hospital. Each ~1,460,080 patients with ~4,707 positives (positive rate ~0.322%). All four passed data validation (status PASS, active).",
+      "rounds": 10,
+      "model_architecture": "PyTorch MLP (differs from the centralized LightGBM)",
+      "total_validation_rows": 1168064,
+      "total_validation_positives": 3764
+    },
+    "round_progression": {
+      "description": "Global sample-weighted metrics per round (fl_training_rounds.csv). AUROC climbs and stabilises over 10 rounds.",
+      "round_1":  { "auroc": 0.8221, "auprc": 0.0122, "brier": 0.1871, "recall_at_0_5": 0.8496, "precision_at_0_5": 0.0080 },
+      "round_5":  { "auroc": 0.8244, "auprc": 0.0130, "brier": 0.1840, "recall_at_0_5": 0.8592, "precision_at_0_5": 0.0081 },
+      "round_10": { "auroc": 0.8251, "auprc": 0.0130, "brier": 0.1839, "recall_at_0_5": 0.8528, "precision_at_0_5": 0.0081 }
+    },
+    "per_client_final": {
+      "client_1": { "population": 1460080, "positives": 4707, "auroc": 0.8290, "recall_at_0_5": 0.8448, "validation": "PASS" },
+      "client_2": { "population": 1460080, "positives": 4707, "auroc": 0.8176, "recall_at_0_5": 0.8406, "validation": "PASS" },
+      "client_3": { "population": 1460080, "positives": 4707, "auroc": 0.8268, "recall_at_0_5": 0.8650, "validation": "PASS" },
+      "client_4": { "population": 1460079, "positives": 4706, "auroc": 0.8271, "recall_at_0_5": 0.8608, "validation": "PASS" },
+      "reading": "All four synthetic clients land within a narrow AUROC range (0.818-0.829), as expected for a random IID split."
+    },
+    "what_is_transmitted": "Only model parameter updates and aggregate validation metrics. No raw patient rows, TAJ identifiers, or individual outcomes leave a client.",
+    "what_it_does_not_prove": [
+      "Clients are synthetic random/IID splits, not real institutions — so this does NOT prove robustness to real cross-site (non-IID) heterogeneity.",
+      "It is a local simulator proof of concept, not a secure provisioned production FLARE deployment.",
+      "The collaborative model is a PyTorch MLP while the centralized benchmark is LightGBM — comparisons are directional.",
+      "The collaborative model's probabilities are not calibrated, so it is not used for product risk scoring.",
+      "No secure aggregation or differential privacy is applied; collaboration reduces but does not eliminate privacy risk.",
+      "No real-institution or external validation has been completed."
+    ]
+  },
+
+  "temporal_validation": {
+    "description": "Rolling-window temporal validation of the centralized model (temporal_validation_metrics.csv). Each prediction year uses the prior 2 years as the observation window. 2017 was skipped because data-readiness did not confirm acceptable completeness. Metrics are on a sampled test split (~44k rows/year).",
+    "years": {
+      "2013": { "observation": "2011-01-01 to 2012-12-31", "prediction": "2013", "auroc": 0.8268, "auprc": 0.2883, "brier_uncalibrated": 0.1534, "brier_sigmoid": 0.0741, "test_positive_rate": 0.0934 },
+      "2014": { "observation": "2012-01-01 to 2013-12-31", "prediction": "2014", "auroc": 0.8213, "auprc": 0.2694, "brier_uncalibrated": 0.1530, "brier_sigmoid": 0.0739, "test_positive_rate": 0.0920 },
+      "2015": { "observation": "2013-01-01 to 2014-12-31", "prediction": "2015", "auroc": 0.8277, "auprc": 0.2703, "brier_uncalibrated": 0.1494, "brier_sigmoid": 0.0694, "test_positive_rate": 0.0860 },
+      "2016": { "observation": "2014-01-01 to 2015-12-31", "prediction": "2016", "auroc": 0.8287, "auprc": 0.2722, "brier_uncalibrated": 0.1496, "brier_sigmoid": 0.0696, "test_positive_rate": 0.0868 }
+    },
+    "reading": "Rolling-window AUROC is stable around 0.821-0.829 and sampled AUPRC around 0.269-0.288 across four prediction years. Sigmoid calibration roughly halves the Brier score in every window. Note the sampled-test positive rate (~8.6-9.3%) is higher than the full-population prevalence (~0.32%) because the temporal eval uses a balanced/sampled split.",
+    "caveat": "Temporal stability is on internal sampled splits only — not external or real-institution validation."
+  },
+
+  "cohort_and_label": {
+    "description": "How the cohort and the broad-diabetes onset label were built. Useful for 'what does onset mean' and 'who is in the cohort' questions.",
+    "scoring_population": 5840319,
+    "observed_positives": 18827,
+    "observed_negatives": 5821492,
+    "overall_positive_rate": 0.003224,
+    "disease_definition": "Broad diabetes = an ICD-10/BNO diagnosis event in groups E10, E11, E12, E13, E14 (type 1, type 2, malnutrition-related, other specified, and unspecified diabetes mellitus).",
+    "label_definition": "diabetes_onset = 1 if at least one broad-diabetes diagnosis is recorded in the patient's 12-month prediction window, else 0. The production scoring run uses observation window 2013-2014 -> prediction year 2015.",
+    "label_status": "Administrative-claims label (diagnosis coding), not clinical confirmation; may contain coding noise.",
+    "leakage_guards": [
+      "Features are computed only from the observation window; the label uses only the later prediction window.",
+      "Geography predictors are excluded in the 'enhanced_clinical' feature set used for the product model.",
+      "Patient-level scores with TAJ identifiers stay in a private/internal directory and never enter the dashboard outputs."
+    ]
+  },
+
+  "dataset_features": {
+    "description": "What the model looks at. Features come from the observation window only and are summarised by product group in feature_importance_summary.csv. The Analytics 'Top risk drivers' chart shows the top 12 by LightGBM gain.",
+    "input_feature_table": "data/processed/uc1_diabetes_enhanced_model_ready.parquet",
+    "feature_groups": [
+      { "group": "Medication burden", "color_hex": "#f87171", "examples": "atc_C_flag/atc_C_count (cardiovascular ATC-C medication use), prescription_count_last_12_months, antihypertensive_medication_count, prescription_span_days, monthly prescription count mean/std, prescription_count_trend, atc_N_count", "why": "Prescription intensity and cardiovascular medication use are the strongest aggregate signals for future diabetes diagnosis." },
+      { "group": "Demographics", "color_hex": "#7aa2f7", "examples": "age_at_index, sex", "why": "Age is the second-strongest single driver; exact birth dates are never retained." },
+      { "group": "Utilization / clinical history", "color_hex": "#f5b45c", "examples": "total_dot (total days-of-therapy), mean_dot/max_dot, observation_span_days, mean/total dispensed quantity, jaro_contact_count (outpatient contacts), unique_bno_code_count", "why": "Captures overall treatment days, dispensing volume, and healthcare-contact intensity." },
+      { "group": "Diagnosis burden", "color_hex": "#a78bfa", "examples": "icd_chapter_I_count (circulatory), icd_chapter_M_count (musculoskeletal), total_diagnosis_event_count, unique_bno_3char_count", "why": "Comorbidity/diagnosis context from coded diagnosis chapters." },
+      { "group": "Comorbidity flags", "color_hex": "#34d399", "examples": "hypertension, obesity, cardiovascular, lipid disorder, kidney disease, mental health flags (shown in the Patient Explorer per-patient card)", "why": "Simple binary comorbidity context used for cohort explanation and the demo patient profiles." }
+    ],
+    "top_drivers_by_gain": [
+      { "rank": 1,  "feature": "atc_C_flag", "ui_label": "Cardiovascular medication use", "gain_millions": 5.63, "group": "Medication burden" },
+      { "rank": 2,  "feature": "age_at_index", "ui_label": "Patient age", "gain_millions": 2.18, "group": "Demographics" },
+      { "rank": 3,  "feature": "total_dot", "ui_label": "Total treatment days", "gain_millions": 0.86, "group": "Utilization / clinical history" },
+      { "rank": 4,  "feature": "prescription_count_last_12_months", "ui_label": "Recent prescriptions (12 mo)", "gain_millions": 0.52, "group": "Medication burden" },
+      { "rank": 5,  "feature": "antihypertensive_medication_count", "ui_label": "antihypertensive medication count", "gain_millions": 0.46, "group": "Medication burden" },
+      { "rank": 6,  "feature": "observation_span_days", "ui_label": "observation span days", "gain_millions": 0.40, "group": "Utilization / clinical history" },
+      { "rank": 7,  "feature": "icd_chapter_I_count", "ui_label": "icd chapter I count", "gain_millions": 0.31, "group": "Diagnosis burden" },
+      { "rank": 8,  "feature": "prescription_span_days", "ui_label": "prescription span days", "gain_millions": 0.30, "group": "Medication burden" },
+      { "rank": 9,  "feature": "atc_C_count", "ui_label": "atc C count", "gain_millions": 0.26, "group": "Medication burden" },
+      { "rank": 10, "feature": "mean_dot", "ui_label": "mean dot", "gain_millions": 0.26, "group": "Utilization / clinical history" },
+      { "rank": 11, "feature": "mean_dispensed_quantity", "ui_label": "mean dispensed quantity", "gain_millions": 0.24, "group": "Utilization / clinical history" },
+      { "rank": 12, "feature": "prescription_count_trend_last_minus_first", "ui_label": "prescription count trend last minus first", "gain_millions": 0.23, "group": "Medication burden" }
+    ],
+    "importance_caveat": "Gain importance describes statistical association within this dataset only — NOT causality. Drivers are for aggregate cohort understanding, not individual clinical decisions.",
+    "ui_note": "The chart legend lists groups Demographics, Medication burden, Utilization / clinical history, Diagnosis history, Comorbidity flags. The CSV labels the diagnosis group 'Diagnosis burden' (not 'Diagnosis history'), so those bars fall back to the default accent colour rather than the purple legend swatch.",
+    "demo_card_columns": ["patient_id", "risk_score (calibrated)", "risk_score_uncalibrated", "risk_percentile", "risk_decile", "risk_band", "top_1/5/10/20_pct flags", "observed_onset", "age", "sex", "hypertension", "obesity", "cardiovascular", "lipid_disorder", "kidney_disease", "mental_health", "antihypertensive_med", "lipid_lowering_med", "antithrombotic_med", "prescription_count", "healthcare_contacts", "unique_diagnoses"],
+    "sensitive_columns_excluded": ["TAJ patient identifier", "raw diagnoses", "raw prescriptions", "raw dates", "raw patient timelines", "geography predictors (in the enhanced_clinical product model)"]
+  },
+
+  "top_k_intervention": {
+    "description": "Patients ranked by calibrated risk; selecting the top-K% gives a workload-vs-case-capture tradeoff. Source: top_k_intervention_summary.json. Drives the Intervention Planner top-k planner and the Analytics percentile explorer / lift curve. NNR = number needed to review = patients contacted per confirmed case.",
+    "groups": [
+      { "top_k_group": "top_1_percent",  "label": "Top 1%",  "selected_patient_count": 58404,   "selected_patient_percent": 1.0,  "observed_positive_count": 4033,  "captured_positive_percent": 21.4214, "risk_enrichment_vs_population": 21.42, "precision": 0.069053, "recall": 0.214214, "specificity": 0.99066,  "f1": 0.10444,  "number_needed_to_review": 14.48, "intervention_type": "Urgent clinic referral", "intervention_timing": "Contact within 30 days" },
+      { "top_k_group": "top_2_percent",  "label": "Top 2%",  "selected_patient_count": 116807,  "selected_patient_percent": 2.0,  "observed_positive_count": 5693,  "captured_positive_percent": 30.2385, "risk_enrichment_vs_population": 15.12, "precision": 0.048739, "recall": 0.302385, "specificity": 0.980913, "f1": 0.083947, "number_needed_to_review": 20.52, "intervention_type": "Priority GP appointment", "intervention_timing": "Contact within 6 weeks" },
+      { "top_k_group": "top_5_percent",  "label": "Top 5%",  "selected_patient_count": 292016,  "selected_patient_percent": 5.0,  "observed_positive_count": 8769,  "captured_positive_percent": 46.5767, "risk_enrichment_vs_population": 9.32,  "precision": 0.030029, "recall": 0.465767, "specificity": 0.951345, "f1": 0.056421, "number_needed_to_review": 33.3,  "intervention_type": "GP-initiated lifestyle prescription", "intervention_timing": "Contact within 3 months" },
+      { "top_k_group": "top_10_percent", "label": "Top 10%", "selected_patient_count": 584032,  "selected_patient_percent": 10.0, "observed_positive_count": 11858, "captured_positive_percent": 62.984,  "risk_enrichment_vs_population": 6.30,  "precision": 0.020304, "recall": 0.62984,  "specificity": 0.901714, "f1": 0.039339, "number_needed_to_review": 49.25, "intervention_type": "Lifestyle programme invitation", "intervention_timing": "Contact within 6 months" },
+      { "top_k_group": "top_20_percent", "label": "Top 20%", "selected_patient_count": 1168064, "selected_patient_percent": 20.0, "observed_positive_count": 14871, "captured_positive_percent": 78.9876, "risk_enrichment_vs_population": 3.95,  "precision": 0.012731, "recall": 0.789876, "specificity": 0.801908, "f1": 0.025059, "number_needed_to_review": 78.55, "intervention_type": "Health promotion outreach", "intervention_timing": "Include in annual review cycle" }
+    ],
+    "how_to_read": "As the group widens, recall (cases captured) rises but precision falls, so NNR (contacts per case) climbs: top 1% finds a case roughly every 14-15 contacts and captures 21.4% of cases; top 20% captures 79% of cases but needs ~79 contacts per case. Pick the widest group your outreach capacity can sustain."
+  },
+
+  "threshold_scenarios": {
+    "description": "Select every patient at or above a calibrated risk threshold. Source: threshold_scenario_summary.json. Drives the Intervention Planner threshold planner. The UI hides thresholds >= 0.20 (they select zero patients because the model's max calibrated score is ~17%) and notes the operational range is 0.005-0.10. Default selected threshold is 0.01.",
+    "rows": [
+      { "threshold": 0.001, "selected_patient_count": 5840319, "selected_patient_percent": 100.0,  "observed_positive_count": 18827, "captured_positive_percent": 100.0,  "recall": 1.0,      "precision": 0.003224, "specificity": 0.0,      "number_needed_to_review": 310.21, "workload_level": "very_high" },
+      { "threshold": 0.002, "selected_patient_count": 5840319, "selected_patient_percent": 100.0,  "observed_positive_count": 18827, "captured_positive_percent": 100.0,  "recall": 1.0,      "precision": 0.003224, "specificity": 0.0,      "number_needed_to_review": 310.21, "workload_level": "very_high" },
+      { "threshold": 0.005, "selected_patient_count": 3207609, "selected_patient_percent": 54.9218,"observed_positive_count": 18514, "captured_positive_percent": 98.3375, "recall": 0.983375, "precision": 0.005772, "specificity": 0.452186, "number_needed_to_review": 173.25, "workload_level": "very_high" },
+      { "threshold": 0.01,  "selected_patient_count": 2331095, "selected_patient_percent": 39.9138,"observed_positive_count": 17760, "captured_positive_percent": 94.3326, "recall": 0.943326, "precision": 0.007619, "specificity": 0.602622, "number_needed_to_review": 131.26, "workload_level": "very_high" },
+      { "threshold": 0.02,  "selected_patient_count": 1656442, "selected_patient_percent": 28.3622,"observed_positive_count": 16422, "captured_positive_percent": 87.2258, "recall": 0.872258, "precision": 0.009914, "specificity": 0.718282, "number_needed_to_review": 100.87, "workload_level": "very_high" },
+      { "threshold": 0.05,  "selected_patient_count": 671757,  "selected_patient_percent": 11.5021,"observed_positive_count": 12455, "captured_positive_percent": 66.155,  "recall": 0.66155,  "precision": 0.018541, "specificity": 0.886747, "number_needed_to_review": 53.93,  "workload_level": "high" },
+      { "threshold": 0.1,   "selected_patient_count": 39384,   "selected_patient_percent": 0.6743, "observed_positive_count": 3303,  "captured_positive_percent": 17.544,  "recall": 0.17544,  "precision": 0.083867, "specificity": 0.993802, "number_needed_to_review": 11.92,  "workload_level": "very_low" }
+    ],
+    "hidden_thresholds": [
+      { "threshold": 0.2, "selected_patient_count": 0, "reason": "Selects zero patients — model max calibrated score is ~17%." },
+      { "threshold": 0.5, "selected_patient_count": 0, "reason": "Selects zero patients — not operationally useful for calibrated rare-event probabilities." }
+    ],
+    "how_to_read": "Lower threshold = wider net (more cases, far more contacts); higher threshold = tighter and more efficient. At 0.005 you contact ~55% of the population and capture 98% of cases (1 case per ~173 contacts); at 0.10 you contact <1% and capture 17.5% (1 case per ~12 contacts)."
+  },
+
+  "risk_score_distribution": {
+    "description": "Histogram of calibrated risk scores across the 5,840,319 cohort. Source: risk_score_distribution.json. Drives the Analytics 'Calibrated risk score distribution' bar chart (x-axis shows every 3rd bin label).",
+    "bins": [
+      { "bin_label": "0.0020-0.0050", "patient_count": 2632710, "patient_percent": 45.0782, "observed_positive_rate": 0.000119 },
+      { "bin_label": "0.0050-0.0100", "patient_count": 876514,  "patient_percent": 15.008,  "observed_positive_rate": 0.00086 },
+      { "bin_label": "0.0100-0.0200", "patient_count": 674653,  "patient_percent": 11.5516, "observed_positive_rate": 0.001983 },
+      { "bin_label": "0.0200-0.0500", "patient_count": 984685,  "patient_percent": 16.8601, "observed_positive_rate": 0.004029 },
+      { "bin_label": "0.0500-0.1000", "patient_count": 632373,  "patient_percent": 10.8277, "observed_positive_rate": 0.014472 },
+      { "bin_label": "0.1000-0.2000", "patient_count": 39384,   "patient_percent": 0.6743,  "observed_positive_rate": 0.083867 }
+    ],
+    "empty_bins": "Bins 0.0000-0.0010, 0.0010-0.0020, 0.2000-0.5000 and 0.5000-1.0000 hold zero patients (min calibrated score ~0.003, max ~0.170).",
+    "how_to_read": "The population is heavily skewed to low risk — ~45% of patients sit in the lowest populated bin (0.002-0.005) and observed onset rate rises with each bin, from 0.012% in the lowest to 8.4% in the highest (0.10-0.20)."
+  },
+
+  "demo_sample": {
+    "description": "The Patient Explorer lookup and the Analytics comorbidity/demographics tables are computed from a 200-patient anonymised demo sample (patient_demo_sample.json), IDs PT-0001 to PT-0200. This is an oversampled stratified sample for demonstration, NOT population proportions.",
+    "band_sample_sizes": { "very_low": 20, "low": 20, "moderate": 30, "high": 50, "very_high": 80 },
+    "per_patient_fields": "risk_score (calibrated 0-1), risk_score_uncalibrated, risk_percentile, risk_decile (1-10), risk_band, top_1/5/10/20_pct flags, observed_onset (administrative label), age, sex, six comorbidity flags, three medication flags, prescription_count, healthcare_contacts, unique_diagnoses.",
+    "analytics_note": "Comorbidity prevalence and demographics by band shown on the Analytics page are derived live from this 200-patient sample (e.g. % of each band's sampled patients with hypertension, mean age, male/female split), so they illustrate band differences rather than exact population figures."
+  },
+
+  "page_visuals": {
+    "description": "Chart-by-chart and panel-by-panel walkthrough so the assistant can describe exactly what is on each page, what every number means, and how to read it.",
+
+    "overview": {
+      "route": "/",
+      "page_title": "Population Risk Dashboard (badge: HELIX CareRisk · UC1 Broad Diabetes Onset Prediction)",
+      "status_badge": "Warning badge: 'For planning use only — not for direct clinical action'.",
+      "kpi_cards": [
+        { "title": "Patients scored", "value": "5,840,319", "hint": "Scored 2026-05-25", "meaning": "Total cohort given a calibrated onset-risk score." },
+        { "title": "High + Very High risk", "value": "584,032", "hint": "10% of population · 63.0% of confirmed cases", "meaning": "High (292,016) + Very High (292,016) bands combined — the top 10% of risk, which contains 11,858 of the 18,827 confirmed cases." },
+        { "title": "Confirmed cases in cohort", "value": "18,827", "hint": "0.32% population prevalence", "meaning": "Patients with a recorded broad-diabetes onset in the label window (administrative label)." },
+        { "title": "Last scored", "value": "2026-05-25", "hint": "Enhanced Clinical LightGBM · Sigmoid calibrated", "meaning": "Date of the scoring run." }
+      ],
+      "risk_band_population_split": {
+        "title": "Risk band population split",
+        "type": "single horizontal stacked bar, width per band = patient_percent, plus a 5-column legend",
+        "segments": "Very Low 50% (green) · Low 30% (lime) · Moderate 10% (amber) · High 5% (orange) · Very High 5% (red)",
+        "legend_per_band": "patient count, % of cohort, and confirmed cases",
+        "how_to_read": "Bar segment width = share of the 5.84M cohort. Half the population is Very Low; only the right-most 10% (High+Very High) carries most of the risk."
+      },
+      "where_to_focus_spotlight": {
+        "title": "Where to focus",
+        "content": "Highlights the Very High band at 9.3x population rate: the top 5% (292,016 patients) carry a 3.0% onset rate (~10x average) and reviewing them captures 46.6% of all confirmed cases. Also states: reviewing ~58K patients (top 1%) finds 1 case every ~15 reviews at 21% recall; top 5% captures 47% of cases.",
+        "how_to_read": "A plain-language argument for prioritising the very_high band first."
+      },
+      "recommended_actions_by_band": {
+        "title": "Recommended actions by band",
+        "rows": "Very High → Urgent clinical review (contact within 30 days); High → Priority outreach (preventive consult within 3 months); Moderate → Enhanced monitoring (HbA1c within 6 months); Low → Lifestyle monitoring; Very Low → Standard care.",
+        "how_to_read": "A colour-coded tier-by-tier action guide (planning guidance, not clinical orders)."
+      },
+      "model_and_data_cards": {
+        "model_card": "Algorithm LightGBM · Calibration Sigmoid (Platt) · Version v1 · Disease ICD-10 E10-E14.",
+        "data_card": "Patients 5,840,319 · Confirmed cases 18,827 · Prevalence 0.322% · Scored 2026-05-25.",
+        "next_steps_card": "Quick links to Patient Explorer, Intervention Planner, Population Analytics."
+      },
+      "privacy_footer": "Aggregate data only — no patient identifiers present in this dashboard."
+    },
+
+    "patient_explorer": {
+      "route": "/patients",
+      "description": "Browse risk bands and look up individual demo patients. Header notes 'Anonymised demo sample — 200 patients'.",
+      "band_kpi_cards": "Five StatCards (one per band) showing patient_count (band-coloured) and a hint of '% · N cases': Very Low 2,920,160 (50% · 472), Low 1,752,095 (30% · 3,484), Moderate 584,032 (10% · 3,013), High 292,016 (5% · 3,089), Very High 292,016 (5% · 8,769).",
+      "band_enrichment_chart": {
+        "title": "Risk enrichment by band",
+        "subtitle": "How much more likely to have diabetes onset vs population average (1.0 = average)",
+        "type": "vertical bar chart (Recharts), one bar per band, band colours, y-axis in 'x' units",
+        "values": "Very Low 0.05x · Low 0.62x · Moderate 1.60x · High 3.28x · Very High 9.32x",
+        "tooltip": "shows enrichment value as 'N× Enrichment vs population'",
+        "how_to_read": "Bar height = times more likely than the population average a patient in that band is to have a recorded onset. Only Moderate and above exceed 1.0x."
+      },
+      "band_summary_table": {
+        "title": "Risk band summary",
+        "columns": ["Band", "Patients", "% Cohort", "Cases", "Case rate", "Enrichment", "Avg risk score", "Action"],
+        "order": "Very High first (reversed)",
+        "avg_risk_score": "mean calibrated risk as %: Very High 8.53% · High 6.13% · Moderate 4.25% · Low 1.54% · Very Low 0.37%",
+        "how_to_read": "Each row is a band; 'Case rate' is the observed onset rate, 'Avg risk score' is mean predicted risk, 'Action' is the recommended-action summary."
+      },
+      "patient_lookup": {
+        "title": "Patient risk lookup — demo sample",
+        "controls": "Search by patient ID, filter by band, sort by risk score or percentile. Default sort: risk score descending.",
+        "list": "200 patients (PT-0001 to PT-0200). Each row shows ID, band badge, calibrated risk %, age, sex, and comorbidity count.",
+        "detail_panel": {
+          "risk_gauge": "Calibrated onset probability as a % with a coloured bar; the bar fills proportionally to score/0.20 (so a 0.085 score fills ~43%).",
+          "percentile_decile": "Risk percentile (e.g. 95.0th) and risk decile (e.g. 10/10), plus the highest top-K flag the patient sits in.",
+          "recommended_action": "Band-specific summary and step list.",
+          "demographics": "Age at index and sex.",
+          "comorbidity_history": "Pills for Hypertension, Obesity, Cardiovascular, Lipid disorder, Kidney disease, Mental health (red if present).",
+          "medication_history": "Pills for Antihypertensive, Lipid-lowering, Antithrombotic.",
+          "healthcare_utilisation": "Contacts, Diagnoses, Prescriptions counts.",
+          "observed_outcome": "Whether a diabetes onset was recorded in the label window (administrative label, demo only)."
+        },
+        "how_to_read": "Pick a patient to see the calibrated risk, where they sit in the population (percentile/decile/top-K), the evidence behind it (comorbidities, meds, utilisation), and the planning action for their band."
+      }
+    },
+
+    "intervention_planner": {
+      "route": "/intervention",
+      "governance_banner": "Planning estimates based on observed administrative labels. Not deployment decisions — clinical and governance review required before any patient-facing workflow.",
+      "capacity_calculator": {
+        "title": "Capacity calculator",
+        "inputs": "Team members (default 5), Contacts per person/week (default 50), Your site population (default 10,000).",
+        "logic": "Weekly capacity = team × contacts/week; monthly = ×4. Recommends the top-K group whose selected_patient_count is closest to monthly capacity. A site-scaling table scales each top-K group's patients and cases by (site population / 5,840,319).",
+        "outputs": "Recommended group, weekly capacity, patients in group, weeks to complete, expected cases found, and a per-group site-estimate table.",
+        "how_to_read": "Enter your team's throughput; the tool picks the widest risk group you can realistically work through and shows the expected case yield at your site's scale."
+      },
+      "top_k_planner": {
+        "title": "Top-K group planner",
+        "default_group": "Top 5%",
+        "selector": "Pills for Top 1/2/5/10/20%.",
+        "stat_cards": "Patients to contact, Confirmed cases captured (+ % of all cases), Risk enrichment (×), Recall (%).",
+        "nnr_visual": "'1 in X' dot grid — for every N patients contacted you find 1 confirmed case (N = number_needed_to_review).",
+        "intervention_card": "Recommended intervention type and timing for the selected group (e.g. Top 1% → Urgent clinic referral, within 30 days).",
+        "summary_table": ["Group", "Patients", "Pop %", "Cases found", "Recall", "1 in X contacts", "Enrichment", "Intervention type"],
+        "recall_precision_chart": {
+          "title": "Recall vs precision by group size",
+          "type": "line chart, x = group size, three lines: Recall %, Precision %, F1 %",
+          "values": "Recall rises 21.4→30.2→46.6→63.0→79.0% from Top 1% to Top 20%; precision falls 6.9→4.9→3.0→2.0→1.3%.",
+          "how_to_read": "Widening the group captures more cases (recall up) but each contact is less likely to find a case (precision down)."
+        }
+      },
+      "threshold_planner": {
+        "title": "Probability threshold planner",
+        "default_threshold": 0.01,
+        "hidden_note": "2 thresholds (≥ 0.20) hidden — they select zero patients because the model's max calibrated score is ~17%. Operational range is 0.005-0.10.",
+        "selector": "Pills for ≥ 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1.",
+        "stat_cards": "Patients selected (+ pop %), Cases captured (+ % of all cases), '1 in X contacts finds a case', Workload level badge.",
+        "summary_table": ["Threshold", "Selected", "Pop %", "Cases", "Recall", "1 in X", "Workload"],
+        "recall_precision_chart": {
+          "title": "Recall vs precision by threshold",
+          "type": "line chart, x = threshold, lines: Recall %, Precision %, and a dashed % Population",
+          "how_to_read": "As the threshold rises, fewer patients are selected, recall falls and precision rises. At ≥0.005 you take ~55% of the population and 98% of cases; at ≥0.10 you take <1% and 17.5% of cases."
+        }
+      }
+    },
+
+    "population_analytics": {
+      "route": "/analytics",
+      "description": "Aggregate risk distribution, enrichment, and risk drivers across the 5,840,319 cohort scored 2026-05-25.",
+      "cumulative_case_capture_curve": {
+        "title": "Cumulative case capture curve",
+        "type": "line chart — model (solid) vs random selection (dashed diagonal); x = % of population contacted (highest risk first), y = % of cases captured",
+        "points": "0%→0, 1%→21.4, 2%→30.2, 5%→46.6, 10%→63.0, 20%→79.0, 100%→100",
+        "reference_line": "vertical dashed line at x=5 labelled 'Top 5% → 46.6% of cases'",
+        "how_to_read": "The gap between the solid model line and the dashed random diagonal is the model's lift. Contacting the highest-risk 5% captures 46.6% of cases vs 5% by chance."
+      },
+      "percentile_explorer": {
+        "title": "Percentile explorer",
+        "default": "Top 5%",
+        "cards": "Patients selected (+ % pop), Cases captured (% + count), Contacts per case found (NNR), Enrichment vs average (×).",
+        "how_to_read": "Pick a population cut-off to see patients, cases captured, contact efficiency and enrichment for that slice."
+      },
+      "population_by_band_chart": {
+        "title": "Population by risk band",
+        "type": "vertical bar chart of patient_count per band",
+        "values": "Very Low 2,920,160 · Low 1,752,095 · Moderate 584,032 · High 292,016 · Very High 292,016",
+        "how_to_read": "Bar height = patients per band; the population is dominated by the Very Low band."
+      },
+      "enrichment_chart": {
+        "title": "Risk enrichment vs population",
+        "type": "vertical bar chart in '×' units",
+        "values": "0.05× · 0.62× · 1.60× · 3.28× · 9.32×",
+        "how_to_read": "Same enrichment values as Patient Explorer; bars above 1.0× are above the population average."
+      },
+      "case_capture_by_band_chart": {
+        "title": "Confirmed case capture by band",
+        "type": "horizontal bar chart of captured_positive_percent per band (Very High at top)",
+        "values": "Very High 46.6% · High 16.4% · Moderate 16.0% · Low 18.5% · Very Low 2.5%",
+        "how_to_read": "What share of ALL confirmed cases sits inside each band. The Very High band alone holds 46.6%."
+      },
+      "comorbidity_profile_table": {
+        "title": "Comorbidity profile by risk band",
+        "type": "heatmap-style table — rows = conditions (Hypertension, Obesity, Cardiovascular, Lipid disorder, Kidney disease, Mental health), columns = bands; cell = % of that band's sampled patients with the condition; darker = higher",
+        "source": "Computed live from the 200-patient demo sample (band sizes: very_low 20, low 20, moderate 30, high 50, very_high 80).",
+        "how_to_read": "Read across a row to see how a condition's prevalence rises with risk band. Illustrative (demo sample), not exact population prevalence."
+      },
+      "demographics_table": {
+        "title": "Patient demographics by risk band",
+        "columns": ["Band", "Sample (n)", "Mean age", "Sex split (M/F bar)", "M / F %"],
+        "source": "Derived from the 200-patient demo sample.",
+        "how_to_read": "Mean age and male/female split per band, from the demo sample."
+      },
+      "calibration_table": {
+        "title": "Calibration quality by band",
+        "columns": ["Band", "Mean predicted", "Observed rate", "Ratio", "Assessment"],
+        "values": "predicted vs observed: Very Low 0.37%/0.02% · Low 1.54%/0.20% · Moderate 4.25%/0.52% · High 6.13%/1.06% · Very High 8.53%/3.00%; all assessed 'Over-predicts' (ratios ~22.8, 7.7, 8.2, 5.8, 2.8).",
+        "footnote": "Calibration verification on the target deployment population is required before clinical use; these figures are from the training/scoring population only.",
+        "how_to_read": "Ratio = predicted/observed; ~1.0 is well calibrated. Here every band over-predicts vs the rare administrative-label rate — a flagged caveat."
+      },
+      "score_distribution_chart": {
+        "title": "Calibrated risk score distribution",
+        "type": "vertical bar chart of patient_count per score bin (x-axis label every 3rd bin)",
+        "values": "0.002-0.005: 2.63M · 0.005-0.010: 877K · 0.010-0.020: 675K · 0.020-0.050: 985K · 0.050-0.100: 632K · 0.100-0.200: 39K",
+        "how_to_read": "Shows the population skew toward low baseline risk; ~45% sit in the lowest populated bin."
+      },
+      "top_risk_drivers": {
+        "title": "Top risk drivers",
+        "type": "horizontal bars of the top 12 features by LightGBM gain importance, coloured by product group, with a group legend",
+        "values": "Cardiovascular medication use (5.63M gain), Patient age (2.18M), Total treatment days (0.86M), Recent prescriptions 12 mo (0.52M), then antihypertensive count, observation span, ICD chapter I count, prescription span, ATC-C count, mean DOT, mean dispensed quantity, prescription count trend.",
+        "footnote": "Feature importance describes statistical association within this dataset only — not causality, and not for individual clinical decisions.",
+        "how_to_read": "Bar length = relative gain. Medication burden and age dominate the model's signal."
+      }
+    },
+
+    "governance": {
+      "route": "/governance",
+      "status_banner": "'Not approved for direct clinical use' — aggregate population risk for planning and prioritisation only; no individual clinical action without completing the required validation steps and governance approvals.",
+      "appropriate_uses": [
+        "Population-level risk stratification for prevention programme planning",
+        "Capacity planning: how many patients to prioritise for outreach",
+        "Internal stakeholder presentations and funding cases",
+        "Research and exploratory analysis of cohort risk profiles",
+        "Evaluation of model readiness before production deployment"
+      ],
+      "not_appropriate_for": [
+        "Direct clinical decision-making for individual patients",
+        "Withholding or prioritising care without clinical oversight",
+        "Communicating individual risk scores to patients without governance approval",
+        "Replacing clinical judgement or established screening guidelines",
+        "Any production patient-facing workflow before completing the required steps"
+      ],
+      "required_before_clinical_deployment": [
+        "Complete real-institution partner site validation with non-synthetic data splits",
+        "Independent external validation on a held-out population",
+        "Clinical stakeholder review of risk band thresholds and recommended actions",
+        "Data governance and privacy impact assessment for patient-level deployment",
+        "Secure production deployment with RBAC, audit logging, and access controls",
+        "Calibration verification on target deployment population",
+        "Regulatory and ethics approval as required by jurisdiction"
+      ],
+      "known_limitations_panel": "Lists L1-L12 from limitations.json (synthetic clients, synthetic/IID split, local simulator, MLP vs LightGBM directional comparison, FL not calibrated, rare-event low precision, no real-institution/external validation, claims coding noise, association-not-causation, aggregate-only v1, residual privacy risk).",
+      "scoring_run_notes_panel": "Lists the 8 product_risk_scoring_summary limitations (private patient-level file, aggregate-only outputs, calibrated centralized model used, FL not used because uncalibrated, bands are planning aids, administrative labels, threshold needs clinical review, no patient-level action without secure deployment).",
+      "privacy_footer": "Aggregate dashboard only — no patient identifiers present."
+    }
+  },
+
+  "key_statistics": {
+    "total_patients_scored": 5840319,
+    "observed_positives": 18827,
+    "observed_negatives": 5821492,
+    "overall_positive_rate": "0.322% (0.003224)",
+    "scoring_model": "enhanced_clinical LightGBM + sigmoid calibration, v1",
+    "scoring_date": "2026-05-25",
+    "calibrated_risk_min": 0.00299932,
+    "calibrated_risk_mean": 0.01803025,
+    "calibrated_risk_median": 0.00595477,
+    "calibrated_risk_max": 0.17024978,
+    "calibrated_risk_p95": 0.06978569,
+    "calibrated_risk_p99": 0.09520611,
+    "band_shares": { "very_low": "50%", "low": "30%", "moderate": "10%", "high": "5%", "very_high": "5%" },
+    "band_case_capture": { "very_low": "2.5%", "low": "18.5%", "moderate": "16.0%", "high": "16.4%", "very_high": "46.6%" },
+    "top5pct_captures": "46.6% of all confirmed cases from 5% of patients (9.3x enrichment)",
+    "top10pct_captures": "63.0% of cases (High + Very High bands)",
+    "centralized_auroc_calibrated": 0.8142,
+    "centralized_auroc_uncalibrated": 0.8188,
+    "federated_auroc": 0.8251,
+    "federated_clients": 4,
+    "federated_rounds": 10,
+    "demo_sample_size": 200
+  },
+
+  "privacy_and_governance": {
+    "patient_identifier_policy": "Dashboard outputs are aggregate only. Patient-level risk scores (including TAJ identifiers) live only in the private/internal predictions directory and never appear in product/dashboard files. The demo lookup uses synthetic IDs (PT-0001..PT-0200).",
+    "exposed": ["aggregate metrics", "aggregate site summaries", "validation summaries", "risk-band summaries", "model performance summaries", "governance reports"],
+    "never_exposed": ["TAJ", "patient-level records", "raw diagnoses", "raw prescriptions", "raw dates", "raw patient timelines", "small-cell sensitive counts"],
+    "required_controls_for_deployment": "Role-based access control, audit logging, encryption in transit and at rest, and secure deployment before any patient-level use. Federated learning reduces raw data sharing but does not eliminate all privacy risk.",
+    "api_note": "No patient-level prediction endpoint exists in version 1. A future POST /api/predict would require secure deployment, authentication, authorization, audit logging, and no raw TAJ exposure."
+  },
+
+  "limitations": [
+    "Administrative-claims risk signal for broad diabetes onset — not a clinical diagnosis and not clinically validated.",
+    "Observed positives are diagnosis-coding events (E10-E14), which may contain coding noise; they are not clinical confirmation.",
+    "Rare-outcome prevalence (~0.32%) means precision is low and accuracy / a 0.50 threshold are misleading planning metrics.",
+    "Risk bands and top-k groups are planning aids, not clinical diagnoses.",
+    "The calibrated centralized LightGBM is the scoring model; the federated model is a proof-of-concept and is NOT used because its probabilities are not calibrated.",
+    "Federated evidence uses 4 synthetic random (IID-style) clients, a local simulator, and a PyTorch MLP — comparisons to the LightGBM benchmark are directional and do not prove real cross-site robustness.",
+    "No real-institution validation and no external validation have been completed.",
+    "Band-level calibration over-predicts vs observed rates in the scoring population; calibration must be verified on the deployment population.",
+    "Feature importance describes statistical association, not causality.",
+    "Version 1 exposes aggregate data only; privacy-preserving collaboration reduces but does not eliminate privacy risk.",
+    "No patient-level clinical action should be taken without secure deployment, data governance approval, and clinical oversight."
+  ],
+
+  "language_policy": {
+    "use_these_terms": [
+      "calibrated diabetes-onset risk score",
+      "administrative-claims risk signal",
+      "predicted onset probability",
+      "observed onset (administrative label)",
+      "risk band / risk percentile / risk decile",
+      "case-capture and number-needed-to-review for planning",
+      "directional model comparison",
+      "proof-of-concept federated evidence"
+    ],
+    "never_use_these_terms": [
+      "this patient has / will develop diabetes",
+      "clinical diagnosis",
+      "clinical recommendation or treatment advice",
+      "this patient should receive an intervention",
+      "deployment-ready clinical decision system",
+      "validated / proven federated deployment",
+      "the model is well calibrated (without the over-prediction caveat)"
+    ],
+    "tone": "Always frame outputs as an aggregate, administrative-claims planning signal. Never imply clinical judgement, individual treatment advice, or patient-specific action. Be honest about the rare-event low precision, the over-prediction calibration caveat, and the synthetic/simulated federated evidence."
+  },
+
+  "glossary": {
+    "broad_diabetes": "Onset defined as an ICD-10/BNO diagnosis in groups E10-E14 within the 12-month prediction window.",
+    "diabetes_onset": "Binary administrative label (1 = a broad-diabetes diagnosis recorded in the prediction window). Not clinical confirmation.",
+    "observation_window": "Earlier period from which model features are computed (e.g. 2013-2014 for the 2015 scoring run).",
+    "prediction_window": "The 12-month period in which onset is measured (the label window).",
+    "calibrated_risk_score": "The sigmoid-calibrated probability (0-1) of broad-diabetes onset; mean ~0.018, max ~0.170 across the cohort.",
+    "risk_band": "Percentile tier of the calibrated score: very_low 0-50, low 50-80, moderate 80-90, high 90-95, very_high 95-100.",
+    "risk_percentile": "Patient's rank in the population by calibrated risk (100 = highest-risk individual).",
+    "risk_decile": "Population decile by risk (10 = highest-risk decile).",
+    "enrichment": "Times more likely than the population average to have a recorded onset (observed band rate / population rate).",
+    "captured_positive_percent": "Share of ALL confirmed cases that fall inside a band or top-k group.",
+    "top_k_group": "The highest-risk K% of patients by calibrated score (top 1/2/5/10/20%).",
+    "number_needed_to_review_NNR": "Patients you must contact to find one confirmed case (≈ 1/precision).",
+    "workload_level": "Relative outreach burden of a threshold scenario (very_low to very_high).",
+    "AUROC": "Area under the ROC curve; ranking/discrimination quality (0.5 random, 1.0 perfect). Centralized ~0.814.",
+    "AUPRC": "Area under the precision-recall curve; the right metric under heavy class imbalance.",
+    "Brier_score": "Mean squared error of predicted probabilities; lower = better calibrated. Sigmoid model 0.0177.",
+    "precision_PPV": "TP/(TP+FP) — share of flagged patients with a recorded onset; low here by nature of a rare event.",
+    "recall_sensitivity": "TP/(TP+FN) — share of all onsets captured.",
+    "specificity": "TN/(TN+FP) — share of non-onset patients correctly left out.",
+    "sigmoid_calibration": "Platt scaling — fits a logistic curve to map raw model scores to calibrated probabilities; improves Brier/log-loss.",
+    "LightGBM": "Gradient-boosted decision-tree model; the centralized scoring model (enhanced_clinical feature set).",
+    "federated_learning": "Collaborative training where each client keeps raw data local and shares only model updates. Here a 4-client, 10-round PyTorch-MLP proof of concept.",
+    "FedAvg": "Federated Averaging — server averages client model parameters, weighted by sample count.",
+    "synthetic_client": "A simulated partner 'site' (client_1..4) created by a random split; not a real hospital.",
+    "TAJ": "Hungarian patient identifier — internal only, never present in dashboard/product outputs.",
+    "enhanced_clinical": "The product feature set; close to enhanced_full but excluding geography predictors.",
+    "administrative_label": "An outcome derived from diagnosis/claims coding rather than clinical confirmation."
+  }
+},
+
+"kpi_catalog": {
+    "description": "Every KPI card shown in the UI. Each entry has the visible label, the short description displayed beneath the value, and the page where it appears. Use this to answer questions about what a specific number means.",
+    "population_health": [
+      {
+        "id": "ph_overview_active_patients",
+        "label": "Active Patients",
+        "description": "Unique patients in the selected year cohort",
+        "detail": "Year-over-year delta shown as ±% vs previous year. Sparkline shows multi-year trend.",
+        "page": "Hospital Dashboard (/overview)"
+      },
+      {
+        "id": "ph_overview_highest_acuity",
+        "label": "Highest Acuity",
+        "description": "Tier 5 (P5) patient count — highest clinical complexity and utilisation. Percentage share of current cohort shown below the value.",
+        "detail": "Turns red border if P5 grew >0.5 pp vs prior year. Links to Risk Progression page.",
+        "page": "Hospital Dashboard (/overview)"
+      },
+      {
+        "id": "ph_overview_escalation_risk",
+        "label": "Escalation Risk",
+        "description": "Tier 4 patients at risk of escalating to Tier 5. Estimated as 35% of the P4 count, based on the historical Tier 4→5 transition rate.",
+        "detail": "35% historical Tier 4→5 rate. Links to Population Forecast.",
+        "page": "Hospital Dashboard (/overview)"
+      },
+      {
+        "id": "ph_overview_risk_tiers",
+        "label": "Risk Tiers",
+        "description": "Share of patients in each clinical risk tier (P1 = low burden, P5 = highest acuity). Mini progress bars per tier.",
+        "page": "Hospital Dashboard (/overview)"
+      },
+      {
+        "id": "ph_data_total_artifacts",
+        "label": "Total artifacts",
+        "description": "Total number of expected federated learning pipeline output files being tracked.",
+        "page": "Data Artifacts (/data-quality)"
+      },
+      {
+        "id": "ph_data_available_artifacts",
+        "label": "Available",
+        "description": "Number of artifact files confirmed present on disk. Completeness percentage shown below.",
+        "page": "Data Artifacts (/data-quality)"
+      },
+      {
+        "id": "ph_data_years_covered",
+        "label": "Years covered",
+        "description": "Number of data years present in the pipeline (e.g. 2010–2017). Turns amber if any artifacts are missing.",
+        "page": "Data Artifacts (/data-quality)"
+      },
+      {
+        "id": "ph_forecast_tier5",
+        "label": "Highest Acuity (Tier 5)",
+        "description": "Projected share of P5 patients at the end of the forecast horizon. Delta in percentage points vs current year baseline.",
+        "page": "Population Forecast (/forecast)"
+      },
+      {
+        "id": "ph_forecast_tier1",
+        "label": "Minimal Burden (Tier 1)",
+        "description": "Projected share of P1 patients at the end of the forecast horizon. Delta in percentage points vs current year baseline.",
+        "page": "Population Forecast (/forecast)"
+      },
+      {
+        "id": "ph_forecast_tier3",
+        "label": "High Medication Need (Tier 3)",
+        "description": "Projected share of P3 patients at forecast horizon end. Only visible in 5-cluster years.",
+        "page": "Population Forecast (/forecast)"
+      },
+      {
+        "id": "ph_forecast_tier4",
+        "label": "Chronic, Stable (Tier 4)",
+        "description": "Projected share of P4 patients at forecast horizon end. Only visible in 5-cluster years.",
+        "page": "Population Forecast (/forecast)"
+      }
+    ],
+    "disease_prediction": [
+      {
+        "id": "disease_home_patients_scored",
+        "label": "Patients scored",
+        "description": "Total patients assigned a calibrated 12-month diabetes onset risk score by the Enhanced Clinical LightGBM model.",
+        "page": "SPICY CareRisk Overview"
+      },
+      {
+        "id": "disease_home_high_very_high_risk",
+        "label": "High + Very High risk",
+        "description": "Combined patient count in the High (90–95th percentile) and Very High (95–100th percentile) risk bands, plus their share of total population and confirmed cases.",
+        "page": "SPICY CareRisk Overview"
+      },
+      {
+        "id": "disease_home_confirmed_cases",
+        "label": "Confirmed cases in cohort",
+        "description": "Total observed diabetes onset events (ICD-10/BNO E10–E14) in the scored population. Population prevalence rate shown below.",
+        "page": "SPICY CareRisk Overview"
+      },
+      {
+        "id": "disease_home_last_scored",
+        "label": "Last scored",
+        "description": "Date the patient population was last scored. Model version and calibration method shown below.",
+        "page": "SPICY CareRisk Overview"
+      },
+      {
+        "id": "disease_explorer_band_very_low",
+        "label": "Very Low risk band",
+        "description": "Patients in the bottom 50th percentile of predicted risk. Lowest diabetes onset probability — standard care recommended.",
+        "page": "Patient Explorer"
+      },
+      {
+        "id": "disease_explorer_band_low",
+        "label": "Low risk band",
+        "description": "Patients in the 50th–80th percentile of predicted risk. Lifestyle monitoring and health promotion recommended.",
+        "page": "Patient Explorer"
+      },
+      {
+        "id": "disease_explorer_band_moderate",
+        "label": "Moderate risk band",
+        "description": "Patients in the 80th–90th percentile. Enhanced monitoring — HbA1c screening within 6 months recommended.",
+        "page": "Patient Explorer"
+      },
+      {
+        "id": "disease_explorer_band_high",
+        "label": "High risk band",
+        "description": "Patients in the 90th–95th percentile. Priority outreach — preventive consultation within 3 months recommended.",
+        "page": "Patient Explorer"
+      },
+      {
+        "id": "disease_explorer_band_very_high",
+        "label": "Very High risk band",
+        "description": "Top 5% of patients by predicted risk (95th–100th percentile). Highest diabetes onset probability — 9.3× population enrichment. Urgent intervention recommended.",
+        "page": "Patient Explorer"
+      },
+      {
+        "id": "disease_intervention_topk_patients_to_contact",
+        "label": "Patients to contact",
+        "description": "Number of patients in the selected top-k group to reach out to for prevention, shown as % of total population.",
+        "page": "Intervention Planner — Top-K tab"
+      },
+      {
+        "id": "disease_intervention_topk_cases_captured",
+        "label": "Confirmed cases captured",
+        "description": "How many of the known diabetes onset cases fall within the selected top-k group, shown as % of all cases in cohort.",
+        "page": "Intervention Planner — Top-K tab"
+      },
+      {
+        "id": "disease_intervention_topk_risk_enrichment",
+        "label": "Risk enrichment",
+        "description": "How many times more likely patients in this group are to have diabetes onset compared to the population average. 1.0× = average risk.",
+        "page": "Intervention Planner — Top-K tab"
+      },
+      {
+        "id": "disease_intervention_topk_recall",
+        "label": "Recall",
+        "description": "Percentage of all diabetes cases in the full cohort that this top-k group captures.",
+        "page": "Intervention Planner — Top-K tab"
+      },
+      {
+        "id": "disease_intervention_threshold_patients_selected",
+        "label": "Patients selected",
+        "description": "Number of patients with predicted risk at or above the chosen probability threshold, shown as % of population.",
+        "page": "Intervention Planner — Threshold tab"
+      },
+      {
+        "id": "disease_intervention_threshold_cases_captured",
+        "label": "Cases captured",
+        "description": "Observed diabetes cases among the patients selected at this threshold, shown as % of all diabetes cases in cohort.",
+        "page": "Intervention Planner — Threshold tab"
+      },
+      {
+        "id": "disease_intervention_threshold_nnr",
+        "label": "1 in X contacts finds a case",
+        "description": "Number needed to review — how many patients must be contacted to find one confirmed diabetes case. Lower is more efficient. Derived as 1 ÷ precision.",
+        "page": "Intervention Planner — Threshold tab"
+      },
+      {
+        "id": "disease_intervention_threshold_workload",
+        "label": "Workload level",
+        "description": "Relative outreach workload at this threshold: low / moderate / high / very high. Based on the percentage of the total population being selected.",
+        "page": "Intervention Planner — Threshold tab"
+      }
+    ],
+    "drug_adherence": [
+      {
+        "id": "adherence_dashboard_test_patients",
+        "label": "Test-set patients",
+        "description": "Number of patients in the held-out test set used to evaluate model performance. 15% stratified split, random_state 42.",
+        "page": "Adherence Dashboard (/adherence)"
+      },
+      {
+        "id": "adherence_dashboard_avg_predicted_risk",
+        "label": "Avg predicted risk",
+        "description": "Mean predicted probability of C09 antihypertensive non-adherence (PDC < 0.80) in 2016, across all test-set patients.",
+        "page": "Adherence Dashboard (/adherence)"
+      },
+      {
+        "id": "adherence_dashboard_observed_nonadherence",
+        "label": "Observed non-adherence",
+        "description": "Actual proportion of test-set patients who had PDC < 0.80 in the 2016 prediction window — the ground-truth non-adherence rate.",
+        "page": "Adherence Dashboard (/adherence)"
+      },
+      {
+        "id": "adherence_dashboard_auroc",
+        "label": "AUROC",
+        "description": "Area Under the ROC Curve — centralized logistic baseline. Measures how well the model ranks non-adherent patients above adherent ones. Closer to 1.0 = better.",
+        "page": "Adherence Dashboard (/adherence)"
+      },
+      {
+        "id": "adherence_dashboard_auprc",
+        "label": "AUPRC",
+        "description": "Area Under the Precision-Recall Curve. More informative than AUROC under class imbalance — measures how well the model identifies non-adherent patients without excessive false positives.",
+        "page": "Adherence Dashboard (/adherence)"
+      },
+      {
+        "id": "adherence_dashboard_brier_score",
+        "label": "Brier Score",
+        "description": "Calibration quality — mean squared error of predicted probabilities vs actual outcomes. Lower is better. 0.0 = perfect, 0.25 = no-skill baseline.",
+        "page": "Adherence Dashboard (/adherence)"
+      },
+      {
+        "id": "adherence_evidence_centralized_auroc",
+        "label": "Centralized AUROC",
+        "description": "Discrimination on held-out test set — no federation, single-site training. Baseline to compare federated models against.",
+        "page": "Evidence (/adherence/evidence)"
+      },
+      {
+        "id": "adherence_evidence_local_fl_auroc",
+        "label": "Local FL AUROC",
+        "description": "FedAvg simulation across 20 regional clients in one process. Shows federated learning is feasible without real multi-site infrastructure.",
+        "page": "Evidence (/adherence/evidence)"
+      },
+      {
+        "id": "adherence_evidence_nvflare_auroc",
+        "label": "NVFLARE AUROC",
+        "description": "NVIDIA FLARE FedAvg simulator — near-centralized performance with privacy. Raw patient data never leaves each client; only model weights are aggregated.",
+        "page": "Evidence (/adherence/evidence)"
+      },
+      {
+        "id": "adherence_evidence_fl_clients",
+        "label": "FL Clients",
+        "description": "Regional clients (Hungarian counties) participating in federated training. Each client trains locally on its own data partition.",
+        "page": "Evidence (/adherence/evidence)"
+      }
+    ]
+  }
+}

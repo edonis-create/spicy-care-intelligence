@@ -61,19 +61,21 @@ function PatientCard({ patient }: { patient: PatientRow }) {
         <div>
           <p className="text-eyebrow mb-0.5">Observed Outcome</p>
           <p className="text-secondary" style={{ fontSize: 12 }}>PDC 2016: <span className="tabular font-medium" style={{ color: 'var(--text-primary)' }}>{fmt(patient.actual_pdc, 3)}</span></p>
+          <p style={{ fontSize: 10, color: 'var(--text-quaternary)', marginTop: 2 }}>PDC = Proportion of Days Covered — share of days the patient had medication available</p>
         </div>
         {outcomeBadge(patient.actual_outcome_text)}
       </div>
       <div>
-        <p className="text-eyebrow mb-2">2015 Adherence History</p>
+        <p className="text-eyebrow mb-0.5">2015 Adherence History</p>
+        <p style={{ fontSize: 10, color: 'var(--text-quaternary)', marginBottom: 8 }}>C09 antihypertensive prescription patterns observed in the year before the prediction window</p>
         <div className="space-y-1">
           {[
-            ['Observed PDC 2015', fmt(patient.c09_2015_pdc_observed, 3)],
-            ['PDC < 0.80 flag', patient.c09_2015_pdc_low_80_flag === 1 ? 'Yes' : 'No'],
-            ['C09 records', String(patient.c09_2015_records ?? '—')],
-            ['Gaps ≥ 30 days', String(patient.c09_2015_gap_count_30d ?? '—')],
-            ['Longest gap (days)', fmt(patient.c09_2015_longest_gap_days, 1)],
-            ['Had Q4 2015 fill', patient.c09_2015_has_q4_fill === 1 ? 'Yes' : 'No'],
+            ['PDC 2015 (adherence score)', fmt(patient.c09_2015_pdc_observed, 3)],
+            ['Non-adherent in 2015 (PDC < 0.80)', patient.c09_2015_pdc_low_80_flag === 1 ? 'Yes' : 'No'],
+            ['C09 prescription fills', String(patient.c09_2015_records ?? '—')],
+            ['Medication gaps ≥ 30 days', String(patient.c09_2015_gap_count_30d ?? '—')],
+            ['Longest gap without medication (days)', fmt(patient.c09_2015_longest_gap_days, 1)],
+            ['Had prescription fill in Q4 2015', patient.c09_2015_has_q4_fill === 1 ? 'Yes' : 'No'],
           ].map(([label, value]) => (
             <div key={label} className="flex items-center justify-between py-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <span className="text-muted" style={{ fontSize: 12 }}>{label}</span>
@@ -83,13 +85,14 @@ function PatientCard({ patient }: { patient: PatientRow }) {
         </div>
       </div>
       <div>
-        <p className="text-eyebrow mb-2">Diagnosis Flags 2015</p>
+        <p className="text-eyebrow mb-0.5">Diagnosis Flags 2015</p>
+        <p style={{ fontSize: 10, color: 'var(--text-quaternary)', marginBottom: 8 }}>ICD-10 disease chapter presence recorded in the year before the prediction window</p>
         <div className="grid grid-cols-2 gap-1.5">
           {[
-            { label: 'Circulatory (I)', v: patient.dx_2015_has_I_circulatory },
-            { label: 'Endocrine (E)', v: patient.dx_2015_has_E_endocrine },
-            { label: 'Genitourinary (N)', v: patient.dx_2015_has_N_genitourinary },
-            { label: 'Respiratory (J)', v: patient.dx_2015_has_J_respiratory },
+            { label: 'Heart & blood vessels (ICD-I)', v: patient.dx_2015_has_I_circulatory },
+            { label: 'Diabetes & hormones (ICD-E)', v: patient.dx_2015_has_E_endocrine },
+            { label: 'Kidneys & bladder (ICD-N)', v: patient.dx_2015_has_N_genitourinary },
+            { label: 'Lungs & airways (ICD-J)', v: patient.dx_2015_has_J_respiratory },
           ].map(({ label, v }) => (
             <div key={label} className="s3 px-2.5 py-1.5 flex items-center justify-between">
               <span className="text-muted" style={{ fontSize: 11 }}>{label}</span>
@@ -99,12 +102,13 @@ function PatientCard({ patient }: { patient: PatientRow }) {
         </div>
       </div>
       <div className="s3 px-4 py-3">
-        <p className="text-eyebrow mb-2">Demographics</p>
+        <p className="text-eyebrow mb-0.5">Demographics</p>
+        <p style={{ fontSize: 10, color: 'var(--text-quaternary)', marginBottom: 8 }}>Patient characteristics recorded at the 2015 observation date</p>
         <div className="grid grid-cols-2 gap-2" style={{ fontSize: 12 }}>
           <div><span className="text-muted">Age group</span><br /><span className="font-medium" style={{ color: 'var(--text-primary)' }}>{patient.age_group_2015 ?? '—'}</span></div>
           <div><span className="text-muted">County (megye)</span><br /><span className="font-medium" style={{ color: 'var(--text-primary)' }}>{patient.megye_mode_2015 ?? '—'}</span></div>
           <div><span className="text-muted">Age at 2015</span><br /><span className="tabular font-medium" style={{ color: 'var(--text-primary)' }}>{patient.age_at_2015 != null ? Math.round(patient.age_at_2015) : '—'}</span></div>
-          <div><span className="text-muted">Client (FL)</span><br /><span className="font-medium" style={{ color: 'var(--info)' }}>{patient.client_id ?? '—'}</span></div>
+          <div><span className="text-muted">Federated client (region)</span><br /><span className="font-medium" style={{ color: 'var(--info)' }}>{patient.client_id ?? '—'}</span></div>
         </div>
       </div>
     </div>

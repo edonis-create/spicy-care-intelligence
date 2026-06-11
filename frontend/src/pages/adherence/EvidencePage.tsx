@@ -25,11 +25,12 @@ const COLS = [
   { key: 'brier_score', label: 'Brier' },
 ] as const
 
-function MiniStat({ label, value, color }: { label: string; value: string; color?: string }) {
+function MiniStat({ label, value, color, desc }: { label: string; value: string; color?: string; desc?: string }) {
   return (
     <div className="s3 px-4 py-3 text-center">
       <p className="text-eyebrow mb-1">{label}</p>
       <p className="font-bold tabular text-h2" style={{ color: color ?? 'var(--text-primary)' }}>{value}</p>
+      {desc && <p className="text-muted mt-1" style={{ fontSize: 11, lineHeight: 1.4 }}>{desc}</p>}
     </div>
   )
 }
@@ -69,10 +70,10 @@ export default function AdherenceEvidencePage() {
           Raw patient data never leaves each federated client; only model weight updates are aggregated.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <MiniStat label="Centralized AUROC" value={dec(base.auroc, 4)} color="var(--info)" />
-          <MiniStat label="Local FL AUROC" value={dec(fl.auroc, 4)} color="var(--warning)" />
-          <MiniStat label="NVFLARE AUROC" value={dec(flare.auroc, 4) === '—' ? '0.8920' : dec(flare.auroc, 4)} color="var(--success)" />
-          <MiniStat label="FL Clients" value={String(s.federated_clients)} />
+          <MiniStat label="Centralized AUROC" value={dec(base.auroc, 4)} color="var(--info)" desc="Discrimination on held-out test set — no federation, single-site training" />
+          <MiniStat label="Local FL AUROC" value={dec(fl.auroc, 4)} color="var(--warning)" desc="FedAvg simulation across 20 regional clients in one process" />
+          <MiniStat label="NVFLARE AUROC" value={dec(flare.auroc, 4) === '—' ? '0.8920' : dec(flare.auroc, 4)} color="var(--success)" desc="NVIDIA FLARE FedAvg simulator — near-centralized performance with privacy" />
+          <MiniStat label="FL Clients" value={String(s.federated_clients)} desc="Regional clients (Hungarian counties) participating in federated training" />
         </div>
       </SectionCard>
 

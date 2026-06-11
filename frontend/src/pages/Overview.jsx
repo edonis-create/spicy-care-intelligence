@@ -308,7 +308,7 @@ export function Overview() {
             <p className="text-[2rem] font-semibold leading-none tracking-[-0.03em] text-fg-primary tabular">
               {formatNumber(patientCount)}
             </p>
-            <p className="mt-1 text-[12px] text-fg-tertiary">in {selectedYear} cohort</p>
+            <p className="mt-1 text-[12px] text-fg-tertiary">Unique patients in the {selectedYear} cohort</p>
           </div>
           <DeltaIndicator delta={patientDelta} inverse={false} />
           {trendData.length > 1 && (
@@ -347,6 +347,7 @@ export function Overview() {
               {formatNumber(p5Count)}
             </p>
             <p className="mt-1 text-[12px] text-red-400">Tier 5 — {p5Current.toFixed(1)}% of cohort</p>
+            <p className="mt-1 text-[11px] text-red-400/70">Most complex, multi-morbid patients with the highest care needs and resource utilisation</p>
           </div>
           {p5Delta != null && (
             <span className={`text-[12px] font-semibold ${p5Delta > 0 ? "text-red-400" : "text-emerald-400"}`}>
@@ -374,6 +375,7 @@ export function Overview() {
               {formatNumber(Math.round(p4Count * 0.35))}
             </p>
             <p className="mt-1 text-[12px] text-amber-400">Tier 4 patients at risk of escalation</p>
+            <p className="mt-1 text-[11px] text-amber-400/70">Estimated Tier 4 patients likely to progress to Tier 5 (highest acuity) within the next year</p>
           </div>
           <p className="text-[12px] text-amber-400">35% historical Tier 4→5 rate</p>
           <Link to="/forecast" className="flex items-center gap-1 text-[12px] font-semibold text-amber-400 hover:text-amber-300">
@@ -387,6 +389,7 @@ export function Overview() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fg-tertiary">Risk Tiers</p>
             <Chip size="sm">{summary?.phenotype_count || 0} active</Chip>
           </div>
+          <p className="text-[11px] text-fg-tertiary">Share of patients in each clinical risk tier (P1 = low, P5 = highest acuity)</p>
           <div className="space-y-2">
             {visibleDistribution.slice(0, 5).map((p) => {
               const meta = PHENOTYPE_BY_ID[p.id];

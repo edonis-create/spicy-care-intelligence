@@ -13,11 +13,14 @@ function dec(v: number | null | undefined, d = 3) {
   if (v == null) return '—'
   return v.toFixed(d)
 }
-function StatRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function StatRow({ label, value, highlight, desc }: { label: string; value: string; highlight?: boolean; desc?: string }) {
   return (
-    <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-      <span className="text-muted" style={{ fontSize: 12 }}>{label}</span>
-      <span className="font-semibold tabular" style={{ fontSize: 13, color: highlight ? 'var(--success)' : 'var(--text-primary)' }}>
+    <div className="flex items-start justify-between gap-3 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div>
+        <span className="text-muted" style={{ fontSize: 12 }}>{label}</span>
+        {desc && <p style={{ fontSize: 10, color: 'var(--text-quaternary)', marginTop: 1 }}>{desc}</p>}
+      </div>
+      <span className="font-semibold tabular shrink-0" style={{ fontSize: 13, color: highlight ? 'var(--success)' : 'var(--text-primary)' }}>
         {value}
       </span>
     </div>
@@ -100,13 +103,13 @@ export default function AdherenceDashboardPage() {
         </SectionCard>
 
         <SectionCard eyebrow="Model Performance" title="Prediction at Threshold 0.50" animDelay={420}>
-          <StatRow label="Accuracy" value={pct(cm.accuracy)} />
-          <StatRow label="Precision (PPV)" value={pct(cm.precision)} />
-          <StatRow label="Recall" value={pct(cm.recall)} />
-          <StatRow label="Specificity" value={pct(cm.specificity)} />
-          <StatRow label="F1 Score" value={dec(cm.f1, 4)} />
-          <StatRow label="Balanced Accuracy" value={pct(cm.balanced_accuracy)} highlight />
-          <StatRow label="Brier Score" value={dec(cm.brier_score, 4)} />
+          <StatRow label="Accuracy" value={pct(cm.accuracy)} desc="Share of all patients correctly classified as adherent or non-adherent" />
+          <StatRow label="Precision (PPV)" value={pct(cm.precision)} desc="Of patients flagged non-adherent, how many truly are — minimises unnecessary interventions" />
+          <StatRow label="Recall (Sensitivity)" value={pct(cm.recall)} desc="Share of truly non-adherent patients the model correctly identifies — minimises missed cases" />
+          <StatRow label="Specificity" value={pct(cm.specificity)} desc="Share of adherent patients correctly identified as low-risk" />
+          <StatRow label="F1 Score" value={dec(cm.f1, 4)} desc="Harmonic mean of Precision and Recall — useful when classes are imbalanced" />
+          <StatRow label="Balanced Accuracy" value={pct(cm.balanced_accuracy)} highlight desc="Average of Sensitivity and Specificity — key metric for imbalanced datasets" />
+          <StatRow label="Brier Score" value={dec(cm.brier_score, 4)} desc="Mean squared error of predicted probabilities — lower is better, 0 is perfect" />
           <div className="mt-4">
             <p className="text-eyebrow mb-2">Confusion Matrix</p>
             <div className="grid grid-cols-2 gap-2">

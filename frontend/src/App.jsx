@@ -28,6 +28,7 @@ import AdherenceEvidencePage from "./pages/adherence/EvidencePage";
 import AdherenceModelCardPage from "./pages/adherence/ModelCardPage";
 import logo from "./assets/logo.svg";
 import { Spinner } from "./components/Spinner";
+import { Chatbot } from "./components/Chatbot";
 import { StatusBanner } from "./components/StatusBanner";
 import { useYear } from "./context/yearContext";
 import { cn, PremiumDropdown } from "./components/ui";
@@ -222,6 +223,7 @@ function App() {
           </div>
         </main>
       </div>
+      <Chatbot />
     </div>
   );
 }

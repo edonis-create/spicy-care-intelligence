@@ -8,6 +8,7 @@ interface MetricCardProps {
   icon?: React.ReactNode
   className?: string
   animDelay?: number
+  kpiId?: string
 }
 
 const TONE_COLORS: Record<string, string> = {

@@ -203,14 +203,17 @@ function PatientDetailPanel({ patient, onClose }: { patient: DemoPatient; onClos
       {/* Risk gauge */}
       <div className="space-y-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-2)] p-4">
         <RiskGauge score={patient.risk_score} band={patient.risk_band} />
+        <p className="text-[10px] text-[var(--text-muted)]">Estimated probability of diabetes onset within 12 months — scored by the SPICY CareRisk LightGBM model</p>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <p className="text-xs text-[var(--text-muted)]">Risk percentile</p>
             <p className="font-semibold text-[var(--text-primary)]">{patient.risk_percentile.toFixed(1)}th</p>
+            <p className="text-[10px] text-[var(--text-muted)] opacity-70">Position among all scored patients</p>
           </div>
           <div>
             <p className="text-xs text-[var(--text-muted)]">Risk decile</p>
             <p className="font-semibold text-[var(--text-primary)]">{patient.risk_decile} / 10</p>
+            <p className="text-[10px] text-[var(--text-muted)] opacity-70">Decile 10 = highest-risk tenth of population</p>
           </div>
         </div>
         {highestFlag && (
@@ -256,35 +259,38 @@ function PatientDetailPanel({ patient, onClose }: { patient: DemoPatient; onClos
 
       {/* Comorbidities */}
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Comorbidity history</p>
+        <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Comorbidity history</p>
+        <p className="mb-2 text-[10px] text-[var(--text-muted)] opacity-70">Pre-existing conditions recorded before the 12-month prediction window — red = present, grey = not recorded</p>
         <div className="flex flex-wrap gap-1.5">
           <ComorbidityPill label="Hypertension" active={patient.hypertension} />
           <ComorbidityPill label="Obesity" active={patient.obesity} />
-          <ComorbidityPill label="Cardiovascular" active={patient.cardiovascular} />
+          <ComorbidityPill label="Cardiovascular disease" active={patient.cardiovascular} />
           <ComorbidityPill label="Lipid disorder" active={patient.lipid_disorder} />
           <ComorbidityPill label="Kidney disease" active={patient.kidney_disease} />
-          <ComorbidityPill label="Mental health" active={patient.mental_health} />
+          <ComorbidityPill label="Mental health condition" active={patient.mental_health} />
         </div>
       </div>
 
       {/* Medications */}
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Medication history</p>
+        <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Medication history</p>
+        <p className="mb-2 text-[10px] text-[var(--text-muted)] opacity-70">Drug classes dispensed before the index date — used as model input features</p>
         <div className="flex flex-wrap gap-1.5">
-          <MedPill label="Antihypertensive" active={patient.antihypertensive_med} />
-          <MedPill label="Lipid-lowering" active={patient.lipid_lowering_med} />
-          <MedPill label="Antithrombotic" active={patient.antithrombotic_med} />
+          <MedPill label="Antihypertensive (lowers blood pressure)" active={patient.antihypertensive_med} />
+          <MedPill label="Lipid-lowering (reduces cholesterol)" active={patient.lipid_lowering_med} />
+          <MedPill label="Antithrombotic (prevents blood clots)" active={patient.antithrombotic_med} />
         </div>
       </div>
 
       {/* Utilisation */}
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Healthcare utilisation</p>
+        <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Healthcare utilisation</p>
+        <p className="mb-2 text-[10px] text-[var(--text-muted)] opacity-70">Activity counts in the year before the prediction window — higher values indicate greater care complexity</p>
         <div className="grid grid-cols-3 gap-2 text-center">
           {[
-            { label: "Contacts", value: patient.healthcare_contacts },
-            { label: "Diagnoses", value: patient.unique_diagnoses },
-            { label: "Prescriptions", value: patient.prescription_count },
+            { label: "Healthcare contacts", value: patient.healthcare_contacts },
+            { label: "Unique diagnoses", value: patient.unique_diagnoses },
+            { label: "Prescription fills", value: patient.prescription_count },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-lg bg-[var(--surface-2)] px-2 py-2.5">
               <p className="text-lg font-semibold tabular-nums text-[var(--text-primary)]">{formatInt(value)}</p>
