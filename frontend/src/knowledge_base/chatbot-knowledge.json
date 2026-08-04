@@ -15,7 +15,7 @@
       {
         "section": "Clinical",
         "items": [
-          { "label": "Hospital Dashboard",  "path": "/overview",                "description": "Population health command center — patient risk distribution, trends, and care priorities." },
+          { "label": "Dashboard",           "path": "/overview",                "description": "Population health command center — patient risk distribution, trends, and care priorities." },
           { "label": "Population Health",   "path": "/yearly-stratification",   "description": "Patient counts and risk tier profiles for the selected year." },
           { "label": "Risk Tier Profiles",  "path": "/phenotype-explorer",      "description": "Inspect phenotype definitions, feature profiles, and side-by-side burden comparison." },
           { "label": "Risk Progression",    "path": "/risk-progression",        "description": "How patients move between risk tiers year over year." },
@@ -1357,27 +1357,27 @@
         "label": "Active Patients",
         "description": "Unique patients in the selected year cohort",
         "detail": "Year-over-year delta shown as ±% vs previous year. Sparkline shows multi-year trend.",
-        "page": "Hospital Dashboard (/overview)"
+        "page": "Dashboard (/overview)"
       },
       {
         "id": "ph_overview_highest_acuity",
         "label": "Highest Acuity",
         "description": "Tier 5 (P5) patient count — highest clinical complexity and utilisation. Percentage share of current cohort shown below the value.",
         "detail": "Turns red border if P5 grew >0.5 pp vs prior year. Links to Risk Progression page.",
-        "page": "Hospital Dashboard (/overview)"
+        "page": "Dashboard (/overview)"
       },
       {
         "id": "ph_overview_escalation_risk",
         "label": "Escalation Risk",
         "description": "Tier 4 patients at risk of escalating to Tier 5. Estimated as 35% of the P4 count, based on the historical Tier 4→5 transition rate.",
         "detail": "35% historical Tier 4→5 rate. Links to Population Forecast.",
-        "page": "Hospital Dashboard (/overview)"
+        "page": "Dashboard (/overview)"
       },
       {
         "id": "ph_overview_risk_tiers",
         "label": "Risk Tiers",
         "description": "Share of patients in each clinical risk tier (P1 = low burden, P5 = highest acuity). Mini progress bars per tier.",
-        "page": "Hospital Dashboard (/overview)"
+        "page": "Dashboard (/overview)"
       },
       {
         "id": "ph_data_total_artifacts",

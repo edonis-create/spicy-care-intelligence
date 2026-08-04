@@ -265,7 +265,7 @@ export function Overview() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Hospital Dashboard"
+        title="Dashboard"
         description="Population health command center — patient risk distribution, trends, and care priorities."
         meta={
           <>

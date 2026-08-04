@@ -72,7 +72,7 @@ function PatientCard({ patient }: { patient: PatientRow }) {
           {[
             ['PDC 2015 (adherence score)', fmt(patient.c09_2015_pdc_observed, 3)],
             ['Non-adherent in 2015 (PDC < 0.80)', patient.c09_2015_pdc_low_80_flag === 1 ? 'Yes' : 'No'],
-            ['C09 prescription fills', String(patient.c09_2015_records ?? '—')],
+            ['Antihypertensive prescription fills', String(patient.c09_2015_records ?? '—')],
             ['Medication gaps ≥ 30 days', String(patient.c09_2015_gap_count_30d ?? '—')],
             ['Longest gap without medication (days)', fmt(patient.c09_2015_longest_gap_days, 1)],
             ['Had prescription fill in Q4 2015', patient.c09_2015_has_q4_fill === 1 ? 'Yes' : 'No'],

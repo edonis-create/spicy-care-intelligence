@@ -40,7 +40,7 @@ export default function AdherenceModelCardPage() {
           <div>
             <p className="text-eyebrow mb-2" style={{ color: 'var(--success)' }}>Approved uses</p>
             <ul className="space-y-1">
-              {['Business development demonstration of adherence risk intelligence.', 'Analytical review of C09 cohort non-adherence risk distribution.', 'Evidence of federated learning feasibility for multi-site analytics.', 'Exploration of claims-based adherence risk signal characteristics.'].map(t => <ListItem key={t} tone="info">{t}</ListItem>)}
+              {['Business development demonstration of adherence risk intelligence.', 'Analytical review of antihypertensives cohort non-adherence risk distribution.', 'Evidence of federated learning feasibility for multi-site analytics.', 'Exploration of claims-based adherence risk signal characteristics.'].map(t => <ListItem key={t} tone="info">{t}</ListItem>)}
             </ul>
           </div>
           <div>
@@ -76,9 +76,9 @@ export default function AdherenceModelCardPage() {
       <SectionCard eyebrow="Features" title="Feature Group Summary" animDelay={180}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { group: 'C09 adherence history', examples: 'PDC, gap counts, last fill, Q4 flag', color: 'var(--accent)' },
+            { group: 'Antihypertensive adherence history', examples: 'PDC, gap counts, last fill, Q4 flag', color: 'var(--accent)' },
             { group: 'All-medication features', examples: 'Total records, ATC diversity, polypharmacy', color: 'var(--info)' },
-            { group: 'Cardiovascular features', examples: 'CV record count, C09 share of CV', color: 'var(--warning)' },
+            { group: 'Cardiovascular features', examples: 'CV record count, antihypertensive share of CV', color: 'var(--warning)' },
             { group: 'Demographics', examples: 'Age, age group, county mode', color: 'var(--success)' },
           ].map(({ group, examples, color }) => (
             <div key={group} className="s3 p-4">

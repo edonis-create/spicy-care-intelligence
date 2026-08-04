@@ -37,7 +37,7 @@ const NAV_GROUPS = [
   {
     label: "Patient Stratification",
     items: [
-      { label: "Hospital Dashboard",  path: "/overview",              icon: LayoutDashboard },
+      { label: "Dashboard",           path: "/overview",              icon: LayoutDashboard },
       { label: "Population Health",   path: "/yearly-stratification", icon: BarChart3 },
       { label: "Risk Tier Profiles",  path: "/phenotype-explorer",    icon: Activity },
       { label: "Risk Progression",    path: "/risk-progression",      icon: GitFork },
@@ -60,7 +60,7 @@ const NAV_GROUPS = [
   {
     label: "Drug Adherence",
     items: [
-      { label: "C09 Overview",     path: "/adherence/dashboard",   icon: HeartPulse },
+      { label: "Antihypertensives Overview", path: "/adherence/dashboard",   icon: HeartPulse },
       { label: "Patient Explorer", path: "/adherence/explorer",    icon: Search },
       { label: "FL Evidence",      path: "/adherence/evidence",    icon: GitFork },
       { label: "Model Card",       path: "/adherence/model-card",  icon: Pill },
